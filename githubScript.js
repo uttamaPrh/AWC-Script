@@ -171,16 +171,19 @@ async function renderModules() {
     const template = $.templates("#modulesTemplate");
     const htmlOutput = template.render({ modules });
 
+const progressTemplate = $.templates("#progressModulesTemplate");
+    const progressOutput = progressTemplate.render({ modules });
+
+    $("#progressModulesContainer").html(progressOutput);
+
+   
     $("#modulesContainer").html(htmlOutput);
 }
 
 async function renderProgressModules() {
     const progressModules = await combineModulesAndLessons();
     console.log("Progress Modules Data:", progressModules); 
-    const progressTemplate = $.templates("#progressModulesTemplate");
-    const progressOutput = progressTemplate.render({ progressModules });
-
-    $("#progressModulesContainer").html(progressOutput);
+    
 }
 
 document.getElementById("fetchModulesLessons").addEventListener("click", function () {
