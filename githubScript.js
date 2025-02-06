@@ -180,6 +180,9 @@ document.getElementById("fetchModulesLessons").addEventListener("click", functio
 document.getElementById("fetchProgressModulesLessons").addEventListener("click", function () {
     renderModules();
 });
+document.getElementById("finalMessageButton").addEventListener("click", function () {
+    renderModules();
+});
 
 //document.addEventListener("DOMContentLoaded", function () {
 //    renderModules();
