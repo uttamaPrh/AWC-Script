@@ -166,14 +166,46 @@ async function combineModulesAndLessons() {
 
 // Render Data using JsRender
 async function renderModules() {
+    // Show Skeleton Loader
+    $("#modulesContainer").html(`
+        <div class="skeleton-loader">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-subtext"></div>
+            <div class="skeleton-meta"></div>
+        </div>
+        <div class="skeleton-loader">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-subtext"></div>
+            <div class="skeleton-meta"></div>
+        </div>
+    `);
+    $("#progressModulesContainer").html(`
+        <div class="skeleton-loader">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-subtext"></div>
+            <div class="skeleton-meta"></div>
+        </div>
+    `);
+
+    // Fetch Data
     const modules = await combineModulesAndLessons();
+
+    // Render Templates
     const template = $.templates("#modulesTemplate");
     const htmlOutput = template.render({ modules });
+
     const progressTemplate = $.templates("#progressModulesTemplate");
     const progressOutput = progressTemplate.render({ modules });
-    $("#progressModulesContainer").html(progressOutput);
+
+    // Replace Skeleton with Real Data
     $("#modulesContainer").html(htmlOutput);
+    $("#progressModulesContainer").html(progressOutput);
 }
+
+
 document.getElementById("fetchModulesLessons").addEventListener("click", function () {
     renderModules();
 });
