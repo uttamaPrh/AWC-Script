@@ -176,7 +176,7 @@ async function renderModules() {
 
 async function renderProgressModules() {
     const progressModules = await combineModulesAndLessons();
-
+    console.log("Progress Modules Data:", progressModules); 
     const progressTemplate = $.templates("#progressModulesTemplate");
     const progressOutput = progressTemplate.render({ progressModules });
 
