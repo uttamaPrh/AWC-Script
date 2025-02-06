@@ -173,8 +173,21 @@ async function renderModules() {
 
     $("#modulesContainer").html(htmlOutput);
 }
+
+async function renderProgressModules() {
+    const progressModules = await combineModulesAndLessons();
+
+    const progressTemplate = $.templates("#progressModulesTemplate");
+    const progressOutput = progressTemplate.render({ progressModules });
+
+    $("#progressModulesContainer").html(progressOutput);
+}
+
 document.getElementById("fetchModulesLessons").addEventListener("click", function () {
     renderModules();
+});
+document.getElementById("fetchProgressModulesLessons").addEventListener("click", function () {
+    renderProgressModules();
 });
 
 //document.addEventListener("DOMContentLoaded", function () {
