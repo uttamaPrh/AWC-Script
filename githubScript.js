@@ -166,29 +166,19 @@ async function combineModulesAndLessons() {
 
 // Render Data using JsRender
 async function renderModules() {
-    // Show Skeleton Loader
-    $("#modulesContainer").html(`
-        <div class="skeleton-loader">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-text"></div>
-            <div class="skeleton-subtext"></div>
-            <div class="skeleton-meta"></div>
+    // Show Skeleton Loader with 5 Cards
+    const skeletonHTML = `
+        <div class="skeleton-container">
+            <div class="skeleton-card skeleton-shimmer"></div>
+            <div class="skeleton-card skeleton-shimmer"></div>
+            <div class="skeleton-card skeleton-shimmer"></div>
+            <div class="skeleton-card skeleton-shimmer"></div>
+            <div class="skeleton-card skeleton-shimmer"></div>
         </div>
-        <div class="skeleton-loader">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-text"></div>
-            <div class="skeleton-subtext"></div>
-            <div class="skeleton-meta"></div>
-        </div>
-    `);
-    $("#progressModulesContainer").html(`
-        <div class="skeleton-loader">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-text"></div>
-            <div class="skeleton-subtext"></div>
-            <div class="skeleton-meta"></div>
-        </div>
-    `);
+    `;
+
+    $("#modulesContainer").html(skeletonHTML);
+    $("#progressModulesContainer").html(skeletonHTML);
 
     // Fetch Data
     const modules = await combineModulesAndLessons();
@@ -204,6 +194,7 @@ async function renderModules() {
     $("#modulesContainer").html(htmlOutput);
     $("#progressModulesContainer").html(progressOutput);
 }
+
 
 
 document.getElementById("fetchModulesLessons").addEventListener("click", function () {
