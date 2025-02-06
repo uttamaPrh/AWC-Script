@@ -183,7 +183,3 @@ document.getElementById("fetchProgressModulesLessons").addEventListener("click",
 document.getElementById("finalMessageButton").addEventListener("click", function () {
     renderModules();
 });
-
-//document.addEventListener("DOMContentLoaded", function () {
-//    renderModules();
-//});
