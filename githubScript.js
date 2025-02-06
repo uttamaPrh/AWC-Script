@@ -173,7 +173,10 @@ async function renderModules() {
 
     $("#modulesContainer").html(htmlOutput);
 }
-
-document.addEventListener("DOMContentLoaded", function () {
+document.getElementById("fetchModulesLessons").addEventListener("click", function () {
     renderModules();
 });
+
+//document.addEventListener("DOMContentLoaded", function () {
+//    renderModules();
+//});
