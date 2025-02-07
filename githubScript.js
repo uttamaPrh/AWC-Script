@@ -1,5 +1,4 @@
 //Script for tab
-   document.body.setAttribute('x-data', `{ selectedTab: 'overview'}`);
   const overviewElements = document.querySelectorAll('.overview');
   overviewElements.forEach((overviewElement) => {
     overviewElement.setAttribute('x-show', "selectedTab === 'overview'");
