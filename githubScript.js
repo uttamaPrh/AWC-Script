@@ -150,6 +150,7 @@ async function combineModulesAndLessons() {
                     Enrolment_Student_ID: lesson.Enrolment_Student_ID,
                     OLessonInProgressLessonEnrolmentinProgress_Lesson_In_Progress_ID: lesson.OLessonInProgressLessonEnrolmentinProgress_Lesson_In_Progress_ID,
                     Module_Name: modulesMap[moduleId].Module_Name,
+                    EnrolmentID: modulesMap[moduleId].EnrolmentID,
                     Don_t_Track_Progress:  modulesMap[moduleId].Don_t_Track_Progress,
                     Course_Course_Access_Type: modulesMap[moduleId].Course_Course_Access_Type,
                     Module_Description: modulesMap[moduleId].Description,
