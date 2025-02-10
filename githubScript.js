@@ -208,12 +208,14 @@ async function renderModules() {
 
 
 
-document.getElementById("fetchModulesLessons").addEventListener("click", function () {
-    renderModules();
-});
-document.getElementById("fetchProgressModulesLessons").addEventListener("click", function () {
-    renderModules();
-});
-document.getElementById("finalMessageButton").addEventListener("click", function () {
-    renderModules();
-});
+function addEventListenerIfExists(id, event, handler) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.addEventListener(event, handler);
+    }
+}
+
+addEventListenerIfExists("fetchModulesLessons", "click", renderModules);
+addEventListenerIfExists("fetchProgressModulesLessons", "click", renderModules);
+addEventListenerIfExists("finalMessageButton", "click", renderModules);
+
