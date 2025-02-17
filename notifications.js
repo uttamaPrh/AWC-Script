@@ -35,11 +35,15 @@ function createNotificationCard(notification, isRead) {
 
 
   card.innerHTML = `
-  <div class="notification-content ${isRead ? "" : "bg-unread"} p-2">
-    <h4 class="text-lg font-semibold">${notification.Title}</h4>
-    <p class="text-sm">${notification.Content}</p>
-    <small class="text-xs opacity-75">${timeAgo(notification.Date_Added)}</small>
-  </div>
+
+<div class="p-2 flex items-start gap-2 justify-between w-full ${isRead ? "" : "bg-unread"}">
+<div class="flex flex-col gap-1">
+ <div class="text-[#414042] text-xs font-semibold font-['Open Sans'] leading-none">${notification.Title}</div>
+  <div class="extraSmallText text-dark">“${notification.Content}”</div>
+  <div class="text-[#586A80] extraSmallText">Novel Writing Essentials</div>
+</div>
+<div class="extraSmallText text-[#586A80]">${timeAgo(notification.Date_Added)}</div>
+</div>
 `;
 
 
