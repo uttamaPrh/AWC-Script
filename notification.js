@@ -56,6 +56,7 @@ function createNotificationCard(notification, isRead) {
 
 
 function processNotification(notification) {
+  const container = document.getElementById("parentNotificationTemplatesInBody");
     const id = Number(notification.ID);
     if (displayedNotifications.has(id)) return;
     displayedNotifications.add(id);
