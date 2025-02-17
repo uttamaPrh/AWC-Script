@@ -55,7 +55,7 @@ function createNotificationCard(notification, isRead) {
           markAsRead(id);
       }
 
-  if(type==='comment' || type ==='post'){
+  if(type==='Comment' || type ==='Post'){
      window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.AssessmentAttempt_Student_ID}&selectedTab=courseChat`;
   }
     
