@@ -35,7 +35,7 @@ function createNotificationCard(notification, isRead) {
 
 
   card.innerHTML = `
-  <div class="notification-content ${isRead ? "" : "bg-[#EBF6F6]"} p-2">
+  <div class="notification-content ${isRead ? "" : "bg-unread"} p-2">
     <h4 class="text-lg font-semibold">${notification.Title}</h4>
     <p class="text-sm">${notification.Content}</p>
     <small class="text-xs opacity-75">${timeAgo(notification.Date_Added)}</small>
