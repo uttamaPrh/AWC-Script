@@ -75,9 +75,9 @@ const container = document.getElementById("parentNotificationTemplatesInBody");
 function updateNotificationReadStatus() {
   cardMap.forEach((card, id) => {
       if (readAnnouncements.has(id)) {
-          card.querySelector(".notification-content").classList.remove("bg-[#EBF6F6]");
+          card.querySelector(".notification-content").classList.remove("bg-unread");
       } else {
-          card.querySelector(".notification-content").classList.add("bg-[#EBF6F6]");
+          card.querySelector(".notification-content").classList.add("bg-white");
       }
   });
 }
