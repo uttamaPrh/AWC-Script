@@ -87,7 +87,7 @@
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
-                  "Api-Key": API_KEY,
+                  "Api-Key": APIii_KEY,
               },
               body: JSON.stringify({
                   query: MARK_READ_MUTATION,
@@ -114,7 +114,7 @@
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
-                  "Api-Key": API_KEY,
+                  "Api-Key": APIii_KEY,
               },
               body: JSON.stringify({ query: READ_QUERY }),
           })
