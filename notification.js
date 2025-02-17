@@ -50,6 +50,7 @@ function createNotificationCard(notification, isRead) {
         }
     });
 
+  
 
     return card;
 }
