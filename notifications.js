@@ -24,7 +24,7 @@ function timeAgo(unixTimestamp) {
 
 function createNotificationCard(notification, isRead) {
   const card = document.createElement("div");
-  card.className = "notification-card p-2 my-2 border rounded cursor-pointer";
+  card.className = "notification-card  my-2  cursor-pointer";
 
 
   for (const key in notification) {
@@ -36,7 +36,7 @@ function createNotificationCard(notification, isRead) {
 
   card.innerHTML = `
 
-<div class="p-2 flex items-start gap-2 justify-between notification-content w-full ${isRead ? "" : "bg-unread"}">
+<div class="p-2 flex items-start gap-2  rounded justify-between notification-content w-full ${isRead ? "" : "bg-unread"}">
 <div class="flex flex-col gap-1">
  <div class="text-[#414042] text-xs font-semibold font-['Open Sans'] leading-none">${notification.Title}</div>
   <div class="extra-small-text text-dark">“${notification.Content}”</div>
