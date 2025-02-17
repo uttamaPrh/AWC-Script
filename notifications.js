@@ -35,7 +35,7 @@ function createNotificationCard(notification, isRead) {
 
 
   card.innerHTML = `
-  <div class="notification-content ${isRead ? "" : "bg-unread"} p-2">
+  <div class="notification-content ${isRead ? "" : "bg-[#EBF6F6]"} p-2">
     <h4 class="text-lg font-semibold">${notification.Title}</h4>
     <p class="text-sm">${notification.Content}</p>
     <small class="text-xs opacity-75">${timeAgo(notification.Date_Added)}</small>
@@ -71,9 +71,9 @@ const container = document.getElementById("parentNotificationTemplatesInBody");
 function updateNotificationReadStatus() {
   cardMap.forEach((card, id) => {
       if (readAnnouncements.has(id)) {
-          card.querySelector(".notification-content").classList.remove("bg-unread");
+          card.querySelector(".notification-content").classList.remove("bg-[#EBF6F6]");
       } else {
-          card.querySelector(".notification-content").classList.add("bg-unread");
+          card.querySelector(".notification-content").classList.add("bg-[#EBF6F6]");
       }
   });
 }
