@@ -24,7 +24,7 @@ function timeAgo(unixTimestamp) {
 
 function createNotificationCard(notification, isRead) {
   const card = document.createElement("div");
-  card.className = "notification-card  my-2  cursor-pointer";
+  card.className = "notification-card  cursor-pointer";
 
 
   for (const key in notification) {
