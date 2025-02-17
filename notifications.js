@@ -54,8 +54,7 @@ function createNotificationCard(notification, isRead) {
       if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
           markAsRead(id);
       }
-    if()
-    window.location('url')
+
   });
 
 
