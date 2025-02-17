@@ -49,9 +49,13 @@ function createNotificationCard(notification, isRead) {
 
   card.addEventListener("click", function () {
       const id = Number(notification.ID);
+    const type= notification.Type;
+    console.log('Type is', type);
       if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
           markAsRead(id);
       }
+    if()
+    window.location('url')
   });
 
 
