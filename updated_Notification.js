@@ -164,55 +164,7 @@ function createNotificationCard(notification, isRead) {
           window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.EnrolmentID}&selectedTab=anouncemnt`;
       }
   });
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
-    const showAllBtn = document.getElementById("allAnnouncements");
-    const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
-
-    if (!onlySeeBtn || !showAllBtn || !noAnnouncementsMessage) {
-        console.error("One or more required elements not found!");
-        return;
-    }
-
-    onlySeeBtn.addEventListener("click", function () {
-        let hasAnnouncements = false;
-
-        cardMap.forEach((card, id) => {
-            const notification = [...displayedNotifications].find(n => n === id);
-            if (!notification) return;
-
-            if (notification.Type === "Announcement") {
-                card.classList.remove("hidden"); // Show Announcements
-                hasAnnouncements = true;
-            } else {
-                card.classList.add("hidden"); // Hide other notifications
-            }
-        });
-
-        // Show "No announcements available" message if none are found
-        if (hasAnnouncements) {
-            noAnnouncementsMessage.classList.add("hidden");
-        } else {
-            noAnnouncementsMessage.classList.remove("hidden");
-        }
-    });
-
-    showAllBtn.addEventListener("click", function () {
-        cardMap.forEach((card) => {
-            card.classList.remove("hidden"); // Show all notifications
-        });
-
-        // Hide the "No announcements available" message when showing all
-        noAnnouncementsMessage.classList.add("hidden");
-    });
-});
-
-
-
-  
+ 
     return card;
 }
 
@@ -230,6 +182,42 @@ function processNotification(notification) {
     container.appendChild(card);
     cardMap.set(id, card);
 }
+// ✅ Filter announcements only
+document.addEventListener("DOMContentLoaded", function () {
+    const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
+    const showAllBtn = document.getElementById("allAnnouncements");
+    const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
+
+    onlySeeBtn.addEventListener("click", function () {
+        let hasAnnouncements = false;
+
+        cardMap.forEach((card, id) => {
+            const notification = notificationData.find(n => Number(n.ID) === id);
+            if (!notification) return;
+
+            if (notification.Type === "Announcement") {
+                card.classList.remove("hidden"); 
+                hasAnnouncements = true;
+            } else {
+                card.classList.add("hidden");
+            }
+        });
+
+        if (hasAnnouncements) {
+            noAnnouncementsMessage.classList.add("hidden");
+        } else {
+            noAnnouncementsMessage.classList.remove("hidden");
+        }
+    });
+
+    showAllBtn.addEventListener("click", function () {
+        cardMap.forEach((card) => {
+            card.classList.remove("hidden"); 
+        });
+
+        noAnnouncementsMessage.classList.add("hidden");
+    });
+});
 
 // ✅ Update read status UI
 function updateNotificationReadStatus() {
