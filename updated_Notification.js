@@ -31,11 +31,11 @@ function timeAgo(unixTimestamp) {
 
 async function fetchClassIds() {
     const query = `
-        query calcContacts {
-            calcContacts(query: [{ where: { id: ${CONTACTss_ID} } }]) {
-                ClassesID: field(arg: ["Classes", "id"])
-            }
-        }
+    query calcEnrolments {
+  calcEnrolments(query: [{ where: { student_id: ${CONTACTss_ID} } }]) {
+    Class_ID: field(arg: ["class_id"])
+  }
+}
     `;
 
     try {
@@ -50,8 +50,8 @@ async function fetchClassIds() {
 
         const result = await response.json();
         console.log('Class IDs:', result);
-        if (result.data && result.data.calcContacts) {
-            return result.data.calcContacts.map(contact => contact.ClassesID);
+        if (result.data && result.data.calcEnrolments) {
+            return result.data.calcEnrolments.map(contact => contact.ClassesID);
         }
         return [];
     } catch (error) {
