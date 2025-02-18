@@ -166,6 +166,28 @@ function createNotificationCard(notification, isRead) {
   });
     return card;
 }
+//Only show Announcemnts
+document.getElementById("OnlyseeAnnouncements").addEventListener("click", function () {
+    cardMap.forEach((card, id) => {
+        const notification = [...displayedNotifications].find(n => n === id);
+        if (!notification) return;
+
+        if (notification.Type === "Announcement") {
+            card.classList.remove("hidden"); // Show Announcements
+        } else {
+            card.classList.add("hidden"); // Hide other notifications
+        }
+    });
+});
+
+// Show all notifications when "All Announcements" is clicked
+document.getElementById("allAnnouncements").addEventListener("click", function () {
+    cardMap.forEach((card) => {
+        card.classList.remove("hidden"); // Show all notifications
+    });
+});
+
+
 
 // ✅ Process and append notification
 function processNotification(notification) {
