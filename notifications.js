@@ -67,7 +67,7 @@ card.addEventListener("click", async function () {
     if (type === 'Comment' || type === 'Post') {
         window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${enrollID}&selectedTab=courseChat`;
     } else if (type === 'Submissions') {
-        window.location.href = `https://courses.writerscentre.com.au/course-details/content/${notification.Lesson_Unique_ID}?eid=${enrollID}`;
+        window.location.href = `https://courses.writerscentre.com.au/course-details/content/${notification.Lesson_Unique_ID1}?eid=${enrollID}`;
     }else{
        window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${enrollID}&selectedTab=anouncemnt`;
     }
