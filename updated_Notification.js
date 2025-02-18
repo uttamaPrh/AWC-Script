@@ -140,7 +140,7 @@ function createNotificationCard(notification, isRead) {
         <div class="p-2 flex items-start gap-2 rounded justify-between notification-content w-full ${isRead ? "bg-white" : "bg-unread"}">
             <div class="flex flex-col gap-1">
                 <div class="text-[#414042] text-xs font-semibold">${notification.Title}</div>
-                <div class="extra-small-text text-dark">“${notification.Content}”</div>
+                <div class="extra-small-text text-dark">“${notification.Content}”-(${notification.Class_Class_Name})</div>
                 <div class="text-[#586A80] extra-small-text">${notification.Course_Course_Name}</div>
             </div>
             <div class="extra-small-text text-[#586A80]">${timeAgo(notification.Date_Added)}</div>
