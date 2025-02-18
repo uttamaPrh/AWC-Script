@@ -62,17 +62,17 @@ async function fetchClassIds() {
     }
 }
 
-// ✅ Function to mark all notifications as read
+// ✅ Function to mark all unread notifications as read
 function markAllAsRead() {
-    console.log("Marking all notifications as read...");
-    
+    console.log("Marking all unread notifications as read...");
+
     notificationIDs.forEach(id => {
         if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
-            markAsRead(id);
+            markAsRead(id); // Only mark unread notifications
         }
     });
 
-    console.log("All notifications marked as read.");
+    console.log("Unread notifications marked as read.");
 }
 
 // ✅ Attach event listener to your existing "Mark All Read" button
@@ -162,6 +162,24 @@ async function initializeSocket() {
     classIds.forEach(classId => connect(classId));
 }
 
+function createNotificationCard(notification, isRead) {
+    const card = document.createElement("div");
+    card.className = "notification-card cursor-pointer";
+
+    card.innerHTML = `
+        <div class="p-2 flex items-start gap-2 rounded justify-between notification-content w-full ${isRead ? "bg-white" : "bg-unread"}">
+            <div class="flex flex-col gap-1">
+                <div class="text-[#414042] text-xs font-semibold">${notification.Title}</div>
+                <div class="extra-small-text text-dark">“${notification.Content}”</div>
+                <div class="text-[#586A80] extra-small-text">${notification.Course_Course_Name}</div>
+            </div>
+            <div class="extra-small-text text-[#586A80]">${timeAgo(notification.Date_Added)}</div>
+        </div>
+    `;
+
+    return card;
+}
+
 function processNotification(notification) {
     const container = document.getElementById("parentNotificationTemplatesInBody");
     const id = Number(notification.ID);
@@ -173,40 +191,28 @@ function processNotification(notification) {
     cardMap.set(id, card);
 }
 
-function markAsRead(announcementId) {
-    if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
-    pendingAnnouncements.add(announcementId);
+async function fetchReadData() {
+    try {
+        const response = await fetch(HTTP_ENDPOINT, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Api-Key": APIii_KEY,
+            },
+            body: JSON.stringify({ query: READ_QUERY }),
+        });
 
-    const variables = {
-        payload: {
-            read_announcement_id: announcementId,
-            read_contact_id: LOGGED_IN_CONTACT_ID,
-        },
-    };
-
-    fetch(HTTP_ENDPOINT, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Api-Key": APIii_KEY,
-        },
-        body: JSON.stringify({
-            query: MARK_READ_MUTATION,
-            variables: variables,
-        }),
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        pendingAnnouncements.delete(announcementId);
-        if (data.data && data.data.createOReadContactReadAnnouncement) {
-            readAnnouncements.add(announcementId);
-            updateNotificationReadStatus();
+        const data = await response.json();
+        if (data.data?.calcOReadContactReadAnnouncements) {
+            data.data.calcOReadContactReadAnnouncements.forEach(record => {
+                if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
+                    readAnnouncements.add(Number(record.Read_Announcement_ID));
+                }
+            });
         }
-    })
-    .catch((error) => {
-        pendingAnnouncements.delete(announcementId);
-        console.error("Error marking notification as read:", error);
-    });
+    } catch (error) {
+        console.error("Error fetching read data:", error);
+    }
 }
 
 initializeSocket();
