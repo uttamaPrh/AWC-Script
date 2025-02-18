@@ -3,11 +3,12 @@ const displayedNotifications = new Set();
 const readAnnouncements = new Set();
 const pendingAnnouncements = new Set();
 const cardMap = new Map();
+const notificationIDs = new Set(); // Store all notification IDs
 
-// Function to get URL parameters
+// Function to get URL parameters safely
 function getQueryParamss(param) {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
+    return urlParams.get(param) || ""; // Return an empty string if null
 }
 
 const enrollID = getQueryParamss('eid');
@@ -61,6 +62,29 @@ async function fetchClassIds() {
     }
 }
 
+// ✅ Function to mark all notifications as read
+function markAllAsRead() {
+    console.log("Marking all notifications as read...");
+    
+    notificationIDs.forEach(id => {
+        if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
+            markAsRead(id);
+        }
+    });
+
+    console.log("All notifications marked as read.");
+}
+
+// ✅ Attach event listener to your existing "Mark All Read" button
+document.addEventListener("DOMContentLoaded", () => {
+    const markAllBtn = document.getElementById("markEveryAsRead"); // Your existing button
+    if (markAllBtn) {
+        markAllBtn.addEventListener("click", markAllAsRead);
+        console.log("Mark All Read button initialized.");
+    } else {
+        console.warn("Button with ID 'markEveryAsRead' not found.");
+    }
+});
 
 async function initializeSocket() {
     const classIds = await fetchClassIds();
@@ -108,8 +132,15 @@ async function initializeSocket() {
             if (!data.payload || !data.payload.data) return;
             const result = data.payload.data.subscribeToCalcAnnouncements;
             if (!result) return;
+
             const notifications = Array.isArray(result) ? result : [result];
-            notifications.forEach(processNotification);
+
+            notifications.forEach(notification => {
+                processNotification(notification);
+                notificationIDs.add(Number(notification.ID)); // Store notification ID
+            });
+
+            console.log("Stored Notification IDs:", [...notificationIDs]); // Debugging
         };
 
         socket.onclose = () => {
@@ -131,46 +162,8 @@ async function initializeSocket() {
     classIds.forEach(classId => connect(classId));
 }
 
-function createNotificationCard(notification, isRead) {
-    const card = document.createElement("div");
-    card.className = "notification-card cursor-pointer";
-
-    for (const key in notification) {
-        if (Object.prototype.hasOwnProperty.call(notification, key)) {
-            card.setAttribute(`data-${key.toLowerCase()}`, notification[key]);
-        }
-    }
-
-    card.innerHTML = `
-        <div class="p-2 flex items-start gap-2 rounded justify-between notification-content w-full ${isRead ? "bg-white" : "bg-unread"}">
-            <div class="flex flex-col gap-1">
-                <div class="text-[#414042] text-xs font-semibold font-['Open Sans'] leading-none">${notification.Title}</div>
-                <div class="extra-small-text text-dark">“${notification.Content}”</div>
-                <div class="text-[#586A80] extra-small-text">${notification.Course_Course_Name}</div>
-            </div>
-            <div class="extra-small-text text-[#586A80]">${timeAgo(notification.Date_Added)}</div>
-        </div>
-    `;
-
-    card.addEventListener("click", async function () {
-        const id = Number(notification.ID);
-        const type = notification.Type;
-
-        if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
-            await markAsRead(id);
-        }
-
-        const baseUrl = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.EnrolmentID}`;
-        window.location.href = type === 'Comment' || type === 'Post' ? `${baseUrl}&selectedTab=courseChat`
-                                : type === 'Submissions' ? `https://courses.writerscentre.com.au/course-details/content/${notification.Lesson_Unique_ID1}?eid=${notification.EnrolmentID}`
-                                : `${baseUrl}&selectedTab=anouncemnt`;
-    });
-
-    return card;
-}
-
 function processNotification(notification) {
-  const container = document.getElementById("parentNotificationTemplatesInBody");
+    const container = document.getElementById("parentNotificationTemplatesInBody");
     const id = Number(notification.ID);
     if (displayedNotifications.has(id)) return;
     displayedNotifications.add(id);
@@ -180,77 +173,40 @@ function processNotification(notification) {
     cardMap.set(id, card);
 }
 
-function updateNotificationReadStatus() {
-    cardMap.forEach((card, id) => {
-        if (readAnnouncements.has(id)) {
-            card.querySelector(".notification-content").classList.remove("bg-unread");
-        } else {
-            card.querySelector(".notification-content").classList.add("bg-white");
-        }
-    });
-}
 function markAsRead(announcementId) {
-            if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
-            pendingAnnouncements.add(announcementId);
-            const variables = {
-                payload: {
-                    read_announcement_id: announcementId,
-                    read_contact_id: LOGGED_IN_CONTACT_ID,
-                },
-            };
+    if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
+    pendingAnnouncements.add(announcementId);
 
+    const variables = {
+        payload: {
+            read_announcement_id: announcementId,
+            read_contact_id: LOGGED_IN_CONTACT_ID,
+        },
+    };
 
-            fetch(HTTP_ENDPOINT, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Api-Key": APIii_KEY,
-                },
-                body: JSON.stringify({
-                    query: MARK_READ_MUTATION,
-                    variables: variables,
-                }),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    pendingAnnouncements.delete(announcementId);
-                    if (data.data && data.data.createOReadContactReadAnnouncement) {
-                        readAnnouncements.add(announcementId);
-                        updateNotificationReadStatus();
-                    }
-                })
-                .catch((error) => {
-                    pendingAnnouncements.delete(announcementId);
-                    console.error("Error marking notification as read:", error);
-                });
-        }
-
-
-
-
-async function fetchReadData() {
-    try {
-        const response = await fetch(HTTP_ENDPOINT, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Api-Key": APIii_KEY,
-            },
-            body: JSON.stringify({ query: READ_QUERY }),
-        });
-
-        const data = await response.json();
-        if (data.data?.calcOReadContactReadAnnouncements) {
-            data.data.calcOReadContactReadAnnouncements.forEach(record => {
-                if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
-                    readAnnouncements.add(Number(record.Read_Announcement_ID));
-                }
-            });
+    fetch(HTTP_ENDPOINT, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Api-Key": APIii_KEY,
+        },
+        body: JSON.stringify({
+            query: MARK_READ_MUTATION,
+            variables: variables,
+        }),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        pendingAnnouncements.delete(announcementId);
+        if (data.data && data.data.createOReadContactReadAnnouncement) {
+            readAnnouncements.add(announcementId);
             updateNotificationReadStatus();
         }
-    } catch (error) {
-        console.error("Error fetching read data:", error);
-    }
+    })
+    .catch((error) => {
+        pendingAnnouncements.delete(announcementId);
+        console.error("Error marking notification as read:", error);
+    });
 }
 
 initializeSocket();
