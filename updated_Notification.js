@@ -146,16 +146,22 @@ function createNotificationCard(notification, isRead) {
             <div class="extra-small-text text-[#586A80]">${timeAgo(notification.Date_Added)}</div>
         </div>
     `;
-  card.addEventListener("click", async function () {
-        const id = Number(notification.ID);
-        const type = notification.Type;
+ card.addEventListener("click", async function () { 
+      const id = Number(notification.ID);
+      const type = notification.Type;
 
-        if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {await markAsRead(id);}
-        const baseUrl = https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${enrollID};
-        window.location.href = type === 'Comment' || type === 'Post' ? ${baseUrl}&selectedTab=courseChat
-                                : type === 'Submissions' ? https://courses.writerscentre.com.au/course-details/content/${notification.Lesson_Unique_ID1}?eid=${enrollID}
-                                : ${baseUrl}&selectedTab=anouncemnt;
-    });
+      if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
+          await markAsRead(id);
+      }
+
+      if (type === 'Comment' || type === 'Post') {
+          window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.EnrolmentID}&selectedTab=courseChat`;
+      } else if (type === 'Submissions') {
+          window.location.href = `https://courses.writerscentre.com.au/course-details/content/${notification.Lesson_Unique_ID1}?eid=${notification.EnrolmentID}`;
+      } else {
+          window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.EnrolmentID}&selectedTab=anouncemnt`;
+      }
+  });
     return card;
 }
 
