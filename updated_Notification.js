@@ -4,6 +4,7 @@ const readAnnouncements = new Set();
 const pendingAnnouncements = new Set();
 const cardMap = new Map();
 const notificationIDs = new Set(); // Store all notification IDs
+const notificationData = [];
 
 // Function to get URL parameters
 function getQueryParamss(param) {
