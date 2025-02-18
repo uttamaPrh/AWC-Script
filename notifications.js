@@ -47,21 +47,22 @@ function createNotificationCard(notification, isRead) {
 `;
 
 
-  card.addEventListener("click", function () {
-      const id = Number(notification.ID);
-    const type= notification.Type;
+card.addEventListener("click", async function () { 
+    const id = Number(notification.ID);
+    const type = notification.Type;
     console.log('Type is', type);
-      if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
-          markAsRead(id);
-      }
 
-  if(type==='Comment' || type ==='Post'){
-     window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.AssessmentAttempt_Student_ID}&selectedTab=courseChat`;
-  }
-      if(type==='Submissions'){
-     window.location.href = `https://courses.writerscentre.com.au/course-details/content/${notification.Lesson_Unique_ID}?eid=${notification.AssessmentAttempt_Student_ID}`;
-  }
-  });
+    if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
+        await markAsRead(id); 
+    }
+
+    if (type === 'Comment' || type === 'Post') {
+        window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.AssessmentAttempt_Student_ID}&selectedTab=courseChat`;
+    } else if (type === 'Submissions') {
+        window.location.href = `https://courses.writerscentre.com.au/course-details/content/${notification.Lesson_Unique_ID}?eid=${notification.AssessmentAttempt_Student_ID}`;
+    }
+});
+
   return card;
 }
 
