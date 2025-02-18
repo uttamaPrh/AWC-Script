@@ -109,7 +109,7 @@ async function initializeSocket() {
             if (!data.payload || !data.payload.data) return;
             const result = data.payload.data.subscribeToCalcAnnouncements;
             if (!result) return;
-
+            console.log('all notifications',result );
             const notifications = Array.isArray(result) ? result : [result];
             notifications.forEach(notification => {
                 processNotification(notification);
