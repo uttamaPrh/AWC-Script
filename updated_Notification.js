@@ -50,6 +50,7 @@ async function fetchClassIds() {
       });
 
       const result = await response.json();
+    console.log('Class id are:',result );
       if (result.data && result.data.calcContacts) {
           return result.data.calcContacts.map(contact => contact.ClassesID);
       }
