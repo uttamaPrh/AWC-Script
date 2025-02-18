@@ -200,6 +200,34 @@ function markAsRead(announcementId) {
             };
 
 
+            fetch(HTTP_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Api-Key": API_KEY,
+                },
+                body: JSON.stringify({
+                    query: MARK_READ_MUTATION,
+                    variables: variables,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    pendingAnnouncements.delete(announcementId);
+                    if (data.data && data.data.createOReadContactReadAnnouncement) {
+                        readAnnouncements.add(announcementId);
+                        updateNotificationReadStatus();
+                    }
+                })
+                .catch((error) => {
+                    pendingAnnouncements.delete(announcementId);
+                    console.error("Error marking notification as read:", error);
+                });
+        }
+
+
+
+
 async function fetchReadData() {
     try {
         const response = await fetch(HTTP_ENDPOINT, {
