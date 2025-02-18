@@ -131,6 +131,47 @@ async function initializeSocket() {
     classIds.forEach(connect);
 }
 
+// ✅ Create notification card
+function createNotificationCard(notification, isRead) {
+    const card = document.createElement("div");
+    card.className = "notification-card cursor-pointer";
+
+    card.innerHTML = `
+        <div class="p-2 flex items-start gap-2 rounded justify-between notification-content w-full ${isRead ? "bg-white" : "bg-unread"}">
+            <div class="flex flex-col gap-1">
+                <div class="text-[#414042] text-xs font-semibold">${notification.Title}</div>
+                <div class="extra-small-text text-dark">“${notification.Content}”</div>
+                <div class="text-[#586A80] extra-small-text">${notification.Course_Course_Name}</div>
+            </div>
+            <div class="extra-small-text text-[#586A80]">${timeAgo(notification.Date_Added)}</div>
+        </div>
+    `;
+
+    return card;
+}
+
+// ✅ Process and append notification
+function processNotification(notification) {
+  const container = document.getElementById("parentNotificationTemplatesInBody");
+    const id = Number(notification.ID);
+    if (displayedNotifications.has(id)) return;
+    displayedNotifications.add(id);
+    const isRead = readAnnouncements.has(id);
+    const card = createNotificationCard(notification, isRead);
+    container.appendChild(card);
+    cardMap.set(id, card);
+}
+
+// ✅ Update read status UI
+function updateNotificationReadStatus() {
+    cardMap.forEach((card, id) => {
+        if (readAnnouncements.has(id)) {
+            card.querySelector(".notification-content").classList.remove("bg-unread");
+            card.querySelector(".notification-content").classList.add("bg-white");
+        }
+    });
+}
+
 // ✅ Mark a single notification as read
 function markAsRead(announcementId) {
     if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
@@ -191,42 +232,5 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("Button with ID 'markEveryAsRead' not found.");
     }
 });
-
-// ✅ Fetch read announcements
-function fetchReadData() {
-    fetch(HTTP_ENDPOINT, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Api-Key": APIii_KEY,
-        },
-        body: JSON.stringify({ query: READ_QUERY }),
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        if (data.data?.calcOReadContactReadAnnouncements) {
-            data.data.calcOReadContactReadAnnouncements.forEach(record => {
-                if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
-                    readAnnouncements.add(Number(record.Read_Announcement_ID));
-                }
-            });
-            updateNotificationReadStatus();
-        }
-    })
-    .catch((error) => {
-        console.error("Error fetching read data:", error);
-    });
-}
-
-// ✅ Update notification read status
-function updateNotificationReadStatus() {
-    cardMap.forEach((card, id) => {
-        if (readAnnouncements.has(id)) {
-            card.querySelector(".notification-content").classList.remove("bg-unread");
-        } else {
-            card.querySelector(".notification-content").classList.add("bg-white");
-        }
-    });
-}
 
 initializeSocket();
