@@ -61,67 +61,99 @@ async function fetchClassIds() {
 }
 
 async function initializeSocket() {
-  const classIds = await fetchClassIds();
-  
-  if (classIds.length === 0) {
-      console.error("No class IDs found. Cannot initialize WebSocket.");
-      return;
-  }
+    const classIds = await fetchClassIds();
+    
+    if (classIds.length === 0) {
+        console.error("No class IDs found. Cannot initialize WebSocket.");
+        return;
+    }
 
-  let socket;
-  let keepAliveInterval;
+    let socket;
+    let keepAliveInterval;
 
-  function sendKeepAlive() {
-      if (socket && socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({ type: "KEEP_ALIVE" }));
-      }
-  }
+    function sendKeepAlive() {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: "KEEP_ALIVE" }));
+        }
+    }
 
-  function connect(classId) {
-      socket = new WebSocket(WS_ENDPOINT, "vitalstats");
-      socket.onopen = () => {
-          socket.send(JSON.stringify({ type: "connection_init" }));
-          keepAliveInterval = setInterval(sendKeepAlive, 28000);
+    function connect(classId) {
+        socket = new WebSocket(WS_ENDPOINT, "vitalstats");
 
-          socket.send(
-              JSON.stringify({
-                  id: "1",
-                  type: "GQL_START",
-                  payload: {
-                      query: SUBSCRIPTION_QUERY,
-                      variables: {
-                          author_id: LOGGED_IN_CONTACT_ID,
-                          id: LOGGED_IN_CONTACT_ID,
-                          class_id: classId,
-                      },
-                  },
-              })
-          );
-          fetchReadData();
-      };
+        socket.onopen = () => {
+            console.log("WebSocket connection opened.");
+            keepAliveInterval = setInterval(sendKeepAlive, 28000);
 
-      socket.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-          if (data.type !== "GQL_DATA") return;
-          if (!data.payload || !data.payload.data) return;
-          const result = data.payload.data.subscribeToCalcAnnouncements;
-          if (!result) return;
-          const notifications = Array.isArray(result) ? result : [result];
-          notifications.forEach(processNotification);
-      };
+            // Ensure the connection is open before sending data
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "connection_init" }));
+                
+                socket.send(
+                    JSON.stringify({
+                        id: "1",
+                        type: "GQL_START",
+                        payload: {
+                            query: SUBSCRIPTION_QUERY,
+                            variables: {
+                                author_id: LOGGED_IN_CONTACT_ID,
+                                id: LOGGED_IN_CONTACT_ID,
+                                class_id: classId,
+                            },
+                        },
+                    })
+                );
 
-      socket.onclose = () => {
-          clearInterval(keepAliveInterval);
-      };
+                fetchReadData();
+            } else {
+                console.warn("WebSocket not ready. Retrying in 500ms...");
+                setTimeout(() => {
+                    if (socket.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({ type: "connection_init" }));
+                        socket.send(
+                            JSON.stringify({
+                                id: "1",
+                                type: "GQL_START",
+                                payload: {
+                                    query: SUBSCRIPTION_QUERY,
+                                    variables: {
+                                        author_id: LOGGED_IN_CONTACT_ID,
+                                        id: LOGGED_IN_CONTACT_ID,
+                                        class_id: classId,
+                                    },
+                                },
+                            })
+                        );
+                    } else {
+                        console.error("WebSocket failed to open in time.");
+                    }
+                }, 500); 
+            }
+        };
 
-      socket.onerror = (error) => {
-          console.error("WebSocket error:", error);
-      };
-  }
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type !== "GQL_DATA") return;
+            if (!data.payload || !data.payload.data) return;
+            const result = data.payload.data.subscribeToCalcAnnouncements;
+            if (!result) return;
+            const notifications = Array.isArray(result) ? result : [result];
+            notifications.forEach(processNotification);
+        };
 
-  // Connect to WebSocket for each class ID
-  classIds.forEach(connect);
+        socket.onclose = () => {
+            console.log("WebSocket closed. Clearing keep-alive interval.");
+            clearInterval(keepAliveInterval);
+        };
+
+        socket.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+    }
+
+    // Connect to WebSocket for each class ID
+    classIds.forEach(connect);
 }
+
 
 // Function to create notification card
 function createNotificationCard(notification, isRead) {
@@ -166,6 +198,7 @@ return card;
 }
 
 function processNotification(notification) {
+ const container = document.getElementById("parentNotificationTemplatesInBody");
 const id = Number(notification.ID);
 if (displayedNotifications.has(id)) return;
 displayedNotifications.add(id);
