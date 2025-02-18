@@ -115,6 +115,7 @@ async function initializeSocket() {
             notifications.forEach(notification => {
                 processNotification(notification);
                 notificationIDs.add(Number(notification.ID)); // Store ID
+                notificationData.push(notification);
             });
 
             console.log("Stored Notification IDs:", [...notificationIDs]); // Debugging
@@ -183,42 +184,7 @@ function processNotification(notification) {
     container.appendChild(card);
     cardMap.set(id, card);
 }
-// ✅ Filter announcements only
-document.addEventListener("DOMContentLoaded", function () {
-    const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
-    const showAllBtn = document.getElementById("allAnnouncements");
-    const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
 
-    onlySeeBtn.addEventListener("click", function () {
-        let hasAnnouncements = false;
-
-        cardMap.forEach((card, id) => {
-            const notification = notificationData.find(n => Number(n.ID) === id);
-            if (!notification) return;
-
-            if (notification.Type === "Announcement") {
-                card.classList.remove("hidden"); 
-                hasAnnouncements = true;
-            } else {
-                card.classList.add("hidden");
-            }
-        });
-
-        if (hasAnnouncements) {
-            noAnnouncementsMessage.classList.add("hidden");
-        } else {
-            noAnnouncementsMessage.classList.remove("hidden");
-        }
-    });
-
-    showAllBtn.addEventListener("click", function () {
-        cardMap.forEach((card) => {
-            card.classList.remove("hidden"); 
-        });
-
-        noAnnouncementsMessage.classList.add("hidden");
-    });
-});
 
 // ✅ Update read status UI
 function updateNotificationReadStatus() {
@@ -319,6 +285,41 @@ fetch(HTTP_ENDPOINT, {
 }
 
 
+// ✅ Filter announcements only
+document.addEventListener("DOMContentLoaded", function () {
+    const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
+    const showAllBtn = document.getElementById("allAnnouncements");
+    const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
 
+    onlySeeBtn.addEventListener("click", function () {
+        let hasAnnouncements = false;
+
+        cardMap.forEach((card, id) => {
+            const notification = notificationData.find(n => Number(n.ID) === id);
+            if (!notification) return;
+
+            if (notification.Type === "Announcement") {
+                card.classList.remove("hidden"); 
+                hasAnnouncements = true;
+            } else {
+                card.classList.add("hidden");
+            }
+        });
+
+        if (hasAnnouncements) {
+            noAnnouncementsMessage.classList.add("hidden");
+        } else {
+            noAnnouncementsMessage.classList.remove("hidden");
+        }
+    });
+
+    showAllBtn.addEventListener("click", function () {
+        cardMap.forEach((card) => {
+            card.classList.remove("hidden"); 
+        });
+
+        noAnnouncementsMessage.classList.add("hidden");
+    });
+});
 
 initializeSocket();
