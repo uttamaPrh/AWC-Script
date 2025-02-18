@@ -189,6 +189,16 @@ function updateNotificationReadStatus() {
         }
     });
 }
+function markAsRead(announcementId) {
+            if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
+            pendingAnnouncements.add(announcementId);
+            const variables = {
+                payload: {
+                    read_announcement_id: announcementId,
+                    read_contact_id: LOGGED_IN_CONTACT_ID,
+                },
+            };
+
 
 async function fetchReadData() {
     try {
