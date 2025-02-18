@@ -232,5 +232,31 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("Button with ID 'markEveryAsRead' not found.");
     }
 });
-
+function fetchReadData() {
+fetch(HTTP_ENDPOINT, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "Api-Key": APIii_KEY,
+    },
+    body: JSON.stringify({ query: READ_QUERY }),
+})
+.then((response) => response.json())
+.then((data) => {
+    if (data.data && data.data.calcOReadContactReadAnnouncements) {
+        const records = Array.isArray(data.data.calcOReadContactReadAnnouncements)
+            ? data.data.calcOReadContactReadAnnouncements
+            : [data.data.calcOReadContactReadAnnouncements];
+        records.forEach((record) => {
+            if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
+                readAnnouncements.add(Number(record.Read_Announcement_ID));
+            }
+        });
+        updateNotificationReadStatus();
+    }
+})
+.catch((error) => {
+    console.error("Error fetching read data:", error);
+});
+}
 initializeSocket();
