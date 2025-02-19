@@ -290,6 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
     const showAllBtn = document.getElementById("allAnnouncements");
     const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
+   const showUnreadAnnounceBtn = document.getElementById("showUnreadAnnouncement");
 
     onlySeeBtn.addEventListener("click", function () {
         let hasAnnouncements = false;
@@ -319,6 +320,21 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         noAnnouncementsMessage.classList.add("hidden");
+    });
+    // ✅ Show only unread announcements
+    showUnreadAnnounceBtn.addEventListener("click", function () {
+        let hasUnread = false;
+
+        cardMap.forEach((card) => {
+            if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
+                card.classList.remove("hidden"); // ✅ Show unread
+                hasUnread = true;
+            } else {
+                card.classList.add("hidden"); // ✅ Hide read
+            }
+        });
+
+        noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
     });
 });
 
