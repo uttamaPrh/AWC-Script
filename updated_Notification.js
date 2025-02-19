@@ -315,8 +315,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const showUnreadAnnounceBtn = document.getElementById("showUnreadAnnouncement");
     const showUnreadAllNotification = document.getElementById("showUnreadAllNotification");
 
-    let showUnreadMode = false; // Track unread announcements mode
-    let showUnreadAllMode = false; // Track unread all notifications mode
+    let showUnreadMode = false;
+    let showUnreadAllMode = false;
 
     function toggleVisibilityByType(type) {
         let hasAnnouncements = false;
@@ -324,18 +324,14 @@ document.addEventListener("DOMContentLoaded", function () {
         showUnreadAllMode = false;
         showUnreadMode = false;
 
-        cardMap.forEach(({ original, clone }, id) => {
+        cardMap.forEach(({ original }, id) => {
             const notification = notificationData.find(n => Number(n.ID) === id);
             if (!notification) return;
 
             const shouldShow = notification.Type === type;
-
-            // Apply to both primary and secondary containers
-            [original, clone].forEach((card) => {
-                if (card) {
-                    card.classList.toggle("hidden", !shouldShow);
-                }
-            });
+            if (original) {
+                original.classList.toggle("hidden", !shouldShow);
+            }
 
             if (shouldShow) hasAnnouncements = true;
         });
@@ -350,13 +346,11 @@ document.addEventListener("DOMContentLoaded", function () {
         showUnreadAllMode = false;
         showUnreadMode = false;
 
-        cardMap.forEach(({ original, clone }) => {
-            [original, clone].forEach((card) => {
-                if (card) {
-                    card.classList.remove("hidden");
-                    hasData = true;
-                }
-            });
+        cardMap.forEach(({ original }) => {
+            if (original) {
+                original.classList.remove("hidden");
+                hasData = true;
+            }
         });
 
         noAllMessage.classList.toggle("hidden", !hasData);
@@ -367,18 +361,16 @@ document.addEventListener("DOMContentLoaded", function () {
         showUnreadMode = !showUnreadMode;
         let hasUnread = false;
 
-        cardMap.forEach(({ original, clone }, id) => {
+        cardMap.forEach(({ original }, id) => {
             const notification = notificationData.find(n => Number(n.ID) === id);
             if (!notification) return;
 
             if (notification.Type === "Announcement") {
                 const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
 
-                [original, clone].forEach((card) => {
-                    if (card) {
-                        card.classList.toggle("hidden", showUnreadMode && !isUnread);
-                    }
-                });
+                if (original) {
+                    original.classList.toggle("hidden", showUnreadMode && !isUnread);
+                }
 
                 if (isUnread) hasUnread = true;
             }
@@ -391,14 +383,12 @@ document.addEventListener("DOMContentLoaded", function () {
         showUnreadAllMode = !showUnreadAllMode;
         let hasUnread = false;
 
-        cardMap.forEach(({ original, clone }) => {
+        cardMap.forEach(({ original }) => {
             const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
 
-            [original, clone].forEach((card) => {
-                if (card) {
-                    card.classList.toggle("hidden", showUnreadAllMode && !isUnread);
-                }
-            });
+            if (original) {
+                original.classList.toggle("hidden", showUnreadAllMode && !isUnread);
+            }
 
             if (isUnread) hasUnread = true;
         });
@@ -406,11 +396,11 @@ document.addEventListener("DOMContentLoaded", function () {
         noAllMessage.classList.toggle("hidden", hasUnread);
     }
 
-    // Attach event listeners
     onlySeeBtn.addEventListener("click", () => toggleVisibilityByType("Announcement"));
     showAllBtn.addEventListener("click", toggleVisibilityAll);
     showUnreadAnnounceBtn.addEventListener("click", toggleUnreadAnnouncements);
     showUnreadAllNotification.addEventListener("click", toggleUnreadNotifications);
 });
+
 
 initializeSocket();
