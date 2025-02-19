@@ -215,21 +215,22 @@ function updateNotificationReadStatus() {
     });
 }
 
-
 function updateMarkAllReadVisibility() {
-    // ✅ Check if there are any unread notifications left
-    let hasUnread = [...cardMap.keys()].some(id => !readAnnouncements.has(id) && !pendingAnnouncements.has(id));
+    // ✅ Check if any card in primary or secondary has class "bg-unread"
+    let hasUnread = document.querySelector(".notification-content.bg-unread") !== null;
 
-    // ✅ Select all elements with the "hideMarkAllReadIfAllRead" class
+    // ✅ Select all elements with class "hideMarkAllReadIfAllRead"
     const markAllReadElements = document.querySelectorAll(".hideMarkAllReadIfAllRead");
 
-    // ✅ Hide or show based on unread status
+    // ✅ Toggle visibility based on unread status
     markAllReadElements.forEach(el => {
-        el.classList.toggle("hidden", !hasUnread); // Show if unread exists, hide if all are read
+        el.classList.toggle("hidden", !hasUnread); // Show if any unread exists, hide if none exist
     });
 
-    console.log(hasUnread ? "🔄 Unread notifications exist, showing 'Mark All Read'." : "✅ All notifications read, hiding 'Mark All Read'.");
+    console.log(hasUnread ? "🔄 Unread notifications exist, showing 'Mark All Read' button." : "✅ All notifications read, hiding 'Mark All Read' button.");
 }
+
+
 
 
 
