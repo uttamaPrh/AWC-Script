@@ -321,45 +321,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
         noAnnouncementsMessage.classList.add("hidden");
     });
-    // ✅ Show only unread announcements
+
+  
+// ✅ Toggle Unread Announcements on Click
+let showUnreadMode = false; // Track current mode
+
 showUnreadAnnounceBtn.addEventListener("click", function () {
+  showUnreadMode = !showUnreadMode; // Toggle the mode
+
   let hasUnread = false;
-  let anyHidden = false;
 
-  // Check if any unread announcements are currently hidden
   cardMap.forEach((card, id) => {
       const notification = notificationData.find(n => Number(n.ID) === id);
       if (!notification) return;
 
       if (notification.Type === "Announcement") {
-          if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
-              if (card.classList.contains("hidden")) {
-                  anyHidden = true; // Found a hidden unread notification
-              }
-          }
-      }
-  });
-
-  // Toggle visibility based on whether any unread announcements are currently hidden
-  cardMap.forEach((card, id) => {
-      const notification = notificationData.find(n => Number(n.ID) === id);
-      if (!notification) return;
-
-      if (notification.Type === "Announcement") {
-          if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
-              if (anyHidden) {
-                  card.classList.remove("hidden"); // ✅ Show unread if any are hidden
+          if (showUnreadMode) {
+              // ✅ Show only unread announcements
+              if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
+                  card.classList.remove("hidden");
                   hasUnread = true;
               } else {
-                  card.classList.add("hidden"); // ✅ Hide unread if all were visible
+                  card.classList.add("hidden");
               }
+          } else {
+              // ✅ Restore all announcements
+              card.classList.remove("hidden");
+              hasUnread = true;
           }
       }
   });
 
-  // Toggle "No unread announcements available" message
+  // ✅ Show/Hide "No unread announcements available" message
   noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
+
 });
+
 
 });
 
