@@ -217,7 +217,7 @@ function updateNotificationReadStatus() {
 
 function updateMarkAllReadVisibility() {
     // ✅ Check if any card in primary or secondary has class "bg-unread"
-    let hasUnread = document.querySelector(".notification-content.bg-unread") !== null;
+    let hasUnread = document.querySelector(".notification-content .bg-unread") !== null;
 
     // ✅ Select all elements with class "hideMarkAllReadIfAllRead"
     const markAllReadElements = document.querySelectorAll(".hideMarkAllReadIfAllRead");
