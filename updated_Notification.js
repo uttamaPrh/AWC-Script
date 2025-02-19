@@ -318,6 +318,12 @@ document.addEventListener("DOMContentLoaded", function () {
     let showUnreadMode = false;
     let showUnreadAllMode = false;
 
+    function updateNoNotificationMessages() {
+        const visibleCards = [...cardMap.values()].filter(({ original }) => original && !original.classList.contains("hidden"));
+        noAllMessage.classList.toggle("hidden", visibleCards.length > 0);
+        noAnnouncementsMessage.classList.toggle("hidden", visibleCards.length > 0);
+    }
+
     function toggleVisibilityByType(type) {
         let hasAnnouncements = false;
 
@@ -336,8 +342,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (shouldShow) hasAnnouncements = true;
         });
 
-        noAnnouncementsMessage.classList.toggle("hidden", hasAnnouncements);
-        noAllMessage.classList.add("hidden");
+        updateNoNotificationMessages();
     }
 
     function toggleVisibilityAll() {
@@ -353,8 +358,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        noAllMessage.classList.toggle("hidden", !hasData);
-        noAnnouncementsMessage.classList.add("hidden");
+        updateNoNotificationMessages();
     }
 
     function toggleUnreadAnnouncements() {
@@ -376,7 +380,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
+        updateNoNotificationMessages();
     }
 
     function toggleUnreadNotifications() {
@@ -393,7 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (isUnread) hasUnread = true;
         });
 
-        noAllMessage.classList.toggle("hidden", hasUnread);
+        updateNoNotificationMessages();
     }
 
     onlySeeBtn.addEventListener("click", () => toggleVisibilityByType("Announcement"));
