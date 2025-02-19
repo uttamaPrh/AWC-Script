@@ -315,14 +315,23 @@ document.addEventListener("DOMContentLoaded", function () {
             noAnnouncementsMessage.classList.remove("hidden");
         }
     });
+showAllBtn.addEventListener("click", function () {
+    let hasData = false;
 
-    showAllBtn.addEventListener("click", function () {
-        cardMap.forEach((card) => {
-            card.classList.remove("hidden"); 
-        });
-
-        noAnnouncementsMessage.classList.add("hidden");
+    cardMap.forEach((card) => {
+        card.classList.remove("hidden");
+        hasData = true; // ✅ Mark as having data
     });
+
+    // ✅ Show "No Messages" if no notifications exist
+    if (hasData) {
+        noAllMessage.classList.add("hidden");
+    } else {
+        noAllMessage.classList.remove("hidden");
+    }
+  noAnnouncementsMessage.classList.add("hidden");
+});
+
 
   
 // ✅ Toggle Unread Announcements on Click
