@@ -174,15 +174,27 @@ return card;
 
 
 // ✅ Process and append notification
+
 function processNotification(notification) {
-const container = document.getElementById("parentNotificationTemplatesInBody");
-const id = Number(notification.ID);
-if (displayedNotifications.has(id)) return;
-displayedNotifications.add(id);
-const isRead = readAnnouncements.has(id);
-const card = createNotificationCard(notification, isRead);
-container.appendChild(card);
-cardMap.set(id, card);
+    const container1 = document.getElementById("parentNotificationTemplatesInBody"); // First container
+    const container2 = document.getElementById("secondaryNotificationContainer"); // Second container
+
+    const id = Number(notification.ID);
+    if (displayedNotifications.has(id)) return;
+    displayedNotifications.add(id);
+    
+    const isRead = readAnnouncements.has(id);
+    const card = createNotificationCard(notification, isRead);
+    
+    // Append to the first container
+    container1.appendChild(card);
+    
+    // Clone the card and append to the second container
+    const cardClone = card.cloneNode(true);
+    container2.appendChild(cardClone);
+    
+    // Store in cardMap
+    cardMap.set(id, card);
 }
 
 
