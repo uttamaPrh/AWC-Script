@@ -325,7 +325,7 @@ document.addEventListener("DOMContentLoaded", function () {
     showUnreadAnnounceBtn.addEventListener("click", function () {
         let hasUnread = false;
 
-        cardMap.forEach((card) => {
+        cardMap.forEach((card, id) => {
            const notification = notificationData.find(n => Number(n.ID) === id);
           if (notification.Type === "Announcement") {
             if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
