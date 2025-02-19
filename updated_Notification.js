@@ -288,6 +288,7 @@ fetch(HTTP_ENDPOINT, {
 // ✅ Filter announcements only
 document.addEventListener("DOMContentLoaded", function () {
     const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
+  const noAllMessage = document.getElementById("noAllMessage");
     const showAllBtn = document.getElementById("allAnnouncements");
     const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
    const showUnreadAnnounceBtn = document.getElementById("showUnreadAnnouncement");
@@ -382,7 +383,7 @@ showUnreadAllNotification.addEventListener("click", function () {
             hasUnread = true;
         }
     });
-    noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
+    noAllMessage.classList.toggle("hidden", hasUnread);
 });
 
   
