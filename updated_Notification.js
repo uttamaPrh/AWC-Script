@@ -216,6 +216,23 @@ function updateNotificationReadStatus() {
 }
 
 
+function updateMarkAllReadVisibility() {
+    // ✅ Check if there are any unread notifications left
+    let hasUnread = [...cardMap.keys()].some(id => !readAnnouncements.has(id) && !pendingAnnouncements.has(id));
+
+    // ✅ Select all elements with the "hideMarkAllReadIfAllRead" class
+    const markAllReadElements = document.querySelectorAll(".hideMarkAllReadIfAllRead");
+
+    // ✅ Hide or show based on unread status
+    markAllReadElements.forEach(el => {
+        el.classList.toggle("hidden", !hasUnread); // Show if unread exists, hide if all are read
+    });
+
+    console.log(hasUnread ? "🔄 Unread notifications exist, showing 'Mark All Read'." : "✅ All notifications read, hiding 'Mark All Read'.");
+}
+
+
+
 // ✅ Mark a single notification as read
 async function markAsRead(announcementId) {
     if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
@@ -247,7 +264,7 @@ async function markAsRead(announcementId) {
         if (data.data && data.data.createOReadContactReadAnnouncement) {
             readAnnouncements.add(announcementId);
             updateNotificationReadStatus();
-            updateMarkAllReadVisibility(); // ✅ Check if "Mark All Read" should be hidden
+            updateMarkAllReadVisibility(); // ✅ Ensures the button hides if all notifications are read
         }
     } catch (error) {
         pendingAnnouncements.delete(announcementId);
@@ -256,19 +273,7 @@ async function markAsRead(announcementId) {
 }
 
 
-function updateMarkAllReadVisibility() {
-    let hasUnread = [...cardMap.keys()].some(id => !readAnnouncements.has(id));
 
-    // ✅ Select all elements with class "hideMarkAllReadIfAllRead"
-    const markAllReadElements = document.querySelectorAll(".hideMarkAllReadIfAllRead");
-
-    // ✅ Hide or show based on unread status
-    markAllReadElements.forEach(el => {
-        el.classList.toggle("hidden", !hasUnread);
-    });
-
-    console.log(hasUnread ? "🔄 Unread notifications exist, showing 'Mark All Read'." : "✅ All notifications read, hiding 'Mark All Read'.");
-}
 
 // ✅ Mark all unread notifications as read
 function markAllAsRead() {
@@ -574,5 +579,6 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
     updateMarkAllReadVisibility(); // ✅ Check on page load
 });
+
 
 initializeSocket();
