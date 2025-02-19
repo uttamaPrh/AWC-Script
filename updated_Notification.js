@@ -365,47 +365,49 @@ function toggleVisibilityByType(type) {
     noAllMessage.classList.add("hidden"); // Hide general "No Messages" when viewing only announcements
 }
 
+function toggleUnreadAnnouncements() {
+    showUnreadMode = !showUnreadMode;
+    let hasUnread = false;
 
+    cardMap.forEach(({ original }, id) => {
+        const notification = notificationData.find(n => Number(n.ID) === id);
+        if (!notification) return;
 
-
-    function toggleUnreadAnnouncements() {
-        showUnreadMode = !showUnreadMode;
-        let hasUnread = false;
-
-        cardMap.forEach(({ original }, id) => {
-            const notification = notificationData.find(n => Number(n.ID) === id);
-            if (!notification) return;
-
-            if (notification.Type === "Announcement") {
-                const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
-
-                if (original) {
-                    original.classList.toggle("hidden", showUnreadMode && !isUnread);
-                }
-
-                if (isUnread) hasUnread = true;
-            }
-        });
-
-        updateNoNotificationMessages();
-    }
-
-    function toggleUnreadNotifications() {
-        showUnreadAllMode = !showUnreadAllMode;
-        let hasUnread = false;
-
-        cardMap.forEach(({ original }) => {
+        if (notification.Type === "Announcement") {
             const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
 
             if (original) {
-                original.classList.toggle("hidden", showUnreadAllMode && !isUnread);
+                original.classList.toggle("hidden", showUnreadMode && !isUnread);
             }
 
             if (isUnread) hasUnread = true;
-        });
+        }
+    });
 
-        updateNoNotificationMessages();
-    }
+    // ✅ Hide "No Messages" and show "No Announcements" only when necessary
+    noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
+    noAllMessage.classList.add("hidden"); // Ensure general "No Messages" is hidden when viewing announcements
+}
+
+function toggleUnreadNotifications() {
+    showUnreadAllMode = !showUnreadAllMode;
+    let hasUnread = false;
+
+    cardMap.forEach(({ original }) => {
+        const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
+
+        if (original) {
+            original.classList.toggle("hidden", showUnreadAllMode && !isUnread);
+        }
+
+        if (isUnread) hasUnread = true;
+    });
+
+    // ✅ Hide "No Announcements" and show "No Messages" only when necessary
+    noAllMessage.classList.toggle("hidden", hasUnread);
+    noAnnouncementsMessage.classList.add("hidden"); // Ensure announcement message is hidden when viewing all
+}
+
 
     onlySeeBtn.addEventListener("click", () => toggleVisibilityByType("Announcement"));
     showAllBtn.addEventListener("click", toggleVisibilityAll);
