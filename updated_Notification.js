@@ -345,21 +345,24 @@ document.addEventListener("DOMContentLoaded", function () {
         updateNoNotificationMessages();
     }
 
-    function toggleVisibilityAll() {
-        let hasData = false;
+function toggleVisibilityAll() {
+    let hasData = false;
 
-        showUnreadAllMode = false;
-        showUnreadMode = false;
+    showUnreadAllMode = false;
+    showUnreadMode = false;
 
-        cardMap.forEach(({ original }) => {
-            if (original) {
-                original.classList.remove("hidden");
-                hasData = true;
-            }
-        });
+    cardMap.forEach(({ original }) => {
+        if (original) {
+            original.classList.remove("hidden");
+            hasData = true; // ✅ Mark as having data
+        }
+    });
 
-        updateNoNotificationMessages();
-    }
+    // ✅ If there are notifications, hide the "No Messages" message
+    noAllMessage.classList.toggle("hidden", hasData);
+    noAnnouncementsMessage.classList.add("hidden");
+}
+
 
     function toggleUnreadAnnouncements() {
         showUnreadMode = !showUnreadMode;
