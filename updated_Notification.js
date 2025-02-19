@@ -324,7 +324,7 @@ document.addEventListener("DOMContentLoaded", function () {
         noAnnouncementsMessage.classList.toggle("hidden", visibleCards.length > 0);
     }
 
-    function toggleVisibilityAll() {
+   function toggleVisibilityAll() {
     let hasData = false;
 
     showUnreadAllMode = false;
@@ -337,9 +337,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ✅ If there are notifications, hide "No Messages", otherwise show it
+    // ✅ Hide "No Announcements" message, only show "No Messages" if no notifications exist
     noAllMessage.classList.toggle("hidden", hasData);
-    noAnnouncementsMessage.classList.add("hidden"); // Hide announcement message
+    noAnnouncementsMessage.classList.add("hidden"); // Hide announcement message when viewing all
 }
 
 function toggleVisibilityByType(type) {
@@ -360,10 +360,11 @@ function toggleVisibilityByType(type) {
         if (shouldShow) hasAnnouncements = true;
     });
 
-    // ✅ If there are announcements, hide "No Announcements", otherwise show it
+    // ✅ Hide "No Messages" when viewing announcements, only show "No Announcements" if empty
     noAnnouncementsMessage.classList.toggle("hidden", hasAnnouncements);
-    noAllMessage.classList.add("hidden"); // Hide general "No Messages"
+    noAllMessage.classList.add("hidden"); // Hide general "No Messages" when viewing only announcements
 }
+
 
 
 
