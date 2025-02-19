@@ -314,7 +314,10 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             noAnnouncementsMessage.classList.remove("hidden");
         }
+       noAllMessage.classList.add("hidden");
     });
+
+  
 showAllBtn.addEventListener("click", function () {
     let hasData = false;
 
