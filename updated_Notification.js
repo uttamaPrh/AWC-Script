@@ -291,6 +291,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const showAllBtn = document.getElementById("allAnnouncements");
     const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
    const showUnreadAnnounceBtn = document.getElementById("showUnreadAnnouncement");
+  const showUnreadAllNotification = document.getElementById("showUnreadAllNotification");
 
     onlySeeBtn.addEventListener("click", function () {
         let hasAnnouncements = false;
@@ -357,6 +358,34 @@ showUnreadAnnounceBtn.addEventListener("click", function () {
 
 });
 
+
+// ✅ Toggle Unread Notifications (Without Checking Type)
+let showUnreadAllMode = false;
+
+showUnreadAllNotification.addEventListener("click", function () {
+    showUnreadAllMode = !showUnreadAllMode; // Toggle the mode
+
+    let hasUnread = false;
+
+    cardMap.forEach((card) => {
+        if (showUnreadAllMode) {
+            // ✅ Show only unread notifications (without type check)
+            if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
+                card.classList.remove("hidden");
+                hasUnread = true;
+            } else {
+                card.classList.add("hidden");
+            }
+        } else {
+            // ✅ Restore all notifications
+            card.classList.remove("hidden");
+            hasUnread = true;
+        }
+    });
+    noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
+});
+
+  
 
 });
 
