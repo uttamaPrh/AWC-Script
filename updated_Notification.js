@@ -324,28 +324,7 @@ document.addEventListener("DOMContentLoaded", function () {
         noAnnouncementsMessage.classList.toggle("hidden", visibleCards.length > 0);
     }
 
-    function toggleVisibilityByType(type) {
-        let hasAnnouncements = false;
-
-        showUnreadAllMode = false;
-        showUnreadMode = false;
-
-        cardMap.forEach(({ original }, id) => {
-            const notification = notificationData.find(n => Number(n.ID) === id);
-            if (!notification) return;
-
-            const shouldShow = notification.Type === type;
-            if (original) {
-                original.classList.toggle("hidden", !shouldShow);
-            }
-
-            if (shouldShow) hasAnnouncements = true;
-        });
-
-        updateNoNotificationMessages();
-    }
-
-function toggleVisibilityAll() {
+    function toggleVisibilityAll() {
     let hasData = false;
 
     showUnreadAllMode = false;
@@ -358,10 +337,34 @@ function toggleVisibilityAll() {
         }
     });
 
-    // ✅ If there are notifications, hide the "No Messages" message
+    // ✅ If there are notifications, hide "No Messages", otherwise show it
     noAllMessage.classList.toggle("hidden", hasData);
-    noAnnouncementsMessage.classList.add("hidden");
+    noAnnouncementsMessage.classList.add("hidden"); // Hide announcement message
 }
+
+function toggleVisibilityByType(type) {
+    let hasAnnouncements = false;
+
+    showUnreadAllMode = false;
+    showUnreadMode = false;
+
+    cardMap.forEach(({ original }, id) => {
+        const notification = notificationData.find(n => Number(n.ID) === id);
+        if (!notification) return;
+
+        const shouldShow = notification.Type === type;
+        if (original) {
+            original.classList.toggle("hidden", !shouldShow);
+        }
+
+        if (shouldShow) hasAnnouncements = true;
+    });
+
+    // ✅ If there are announcements, hide "No Announcements", otherwise show it
+    noAnnouncementsMessage.classList.toggle("hidden", hasAnnouncements);
+    noAllMessage.classList.add("hidden"); // Hide general "No Messages"
+}
+
 
 
     function toggleUnreadAnnouncements() {
