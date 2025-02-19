@@ -175,8 +175,8 @@ return card;
 
 // ✅ Process and append notification
 function processNotification(notification) {
-    const container1 = document.getElementById("parentNotificationTemplatesInBody"); // First container
-    const container2 = document.getElementById("secondaryNotificationContainer"); // Second container
+    const container1 = document.getElementById("parentNotificationTemplatesInBody");
+    const container2 = document.getElementById("secondaryNotificationContainer"); 
 
     const id = Number(notification.ID);
     if (displayedNotifications.has(id)) return;
@@ -185,16 +185,20 @@ function processNotification(notification) {
     const isRead = readAnnouncements.has(id);
     const card = createNotificationCard(notification, isRead);
     
-    // Append to the first container
+    // Append to the primary container
     container1.appendChild(card);
-    
-    // Clone and reattach event listeners
-    const cardClone = createNotificationCard(notification, isRead);
-    container2.appendChild(cardClone);
-    
-    // Store in cardMap for both cards
+    let cardClone = null;
+
+    // Append to the secondary container only if it exists
+    if (container2) {
+        cardClone = createNotificationCard(notification, isRead);
+        container2.appendChild(cardClone);
+    }
+
+    // Store both the original and cloned cards in cardMap (if cloned)
     cardMap.set(id, { original: card, clone: cardClone });
 }
+
 
 
 
