@@ -306,125 +306,111 @@ console.error("Error fetching read data:", error);
 });
 }
 
-
 // ✅ Filter announcements only
 document.addEventListener("DOMContentLoaded", function () {
-const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
-const noAllMessage = document.getElementById("noAllMessage");
-const showAllBtn = document.getElementById("allAnnouncements");
-const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
-const showUnreadAnnounceBtn = document.getElementById("showUnreadAnnouncement");
-const showUnreadAllNotification = document.getElementById("showUnreadAllNotification");
-let showUnreadMode = false; // Track current mode
-let showUnreadAllMode = false;
+    const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
+    const noAllMessage = document.getElementById("noAllMessage");
+    const showAllBtn = document.getElementById("allAnnouncements");
+    const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
+    const showUnreadAnnounceBtn = document.getElementById("showUnreadAnnouncement");
+    const showUnreadAllNotification = document.getElementById("showUnreadAllNotification");
 
-onlySeeBtn.addEventListener("click", function () {
-    let hasAnnouncements = false;
-    showUnreadAllMode=false;
-    showUnreadMode=false;
-    cardMap.forEach((card, id) => {
-        const notification = notificationData.find(n => Number(n.ID) === id);
-        if (!notification) return;
+    let showUnreadMode = false; // Track unread announcements mode
+    let showUnreadAllMode = false; // Track unread all notifications mode
 
-        if (notification.Type === "Announcement") {
-            card.classList.remove("hidden"); 
-            hasAnnouncements = true;
-        } else {
-            card.classList.add("hidden");
-        }
-    });
+    function toggleVisibilityByType(type) {
+        let hasAnnouncements = false;
 
-    if (hasAnnouncements) {
+        showUnreadAllMode = false;
+        showUnreadMode = false;
+
+        cardMap.forEach(({ original, clone }, id) => {
+            const notification = notificationData.find(n => Number(n.ID) === id);
+            if (!notification) return;
+
+            const shouldShow = notification.Type === type;
+
+            // Apply to both primary and secondary containers
+            [original, clone].forEach((card) => {
+                if (card) {
+                    card.classList.toggle("hidden", !shouldShow);
+                }
+            });
+
+            if (shouldShow) hasAnnouncements = true;
+        });
+
+        noAnnouncementsMessage.classList.toggle("hidden", hasAnnouncements);
+        noAllMessage.classList.add("hidden");
+    }
+
+    function toggleVisibilityAll() {
+        let hasData = false;
+
+        showUnreadAllMode = false;
+        showUnreadMode = false;
+
+        cardMap.forEach(({ original, clone }) => {
+            [original, clone].forEach((card) => {
+                if (card) {
+                    card.classList.remove("hidden");
+                    hasData = true;
+                }
+            });
+        });
+
+        noAllMessage.classList.toggle("hidden", !hasData);
         noAnnouncementsMessage.classList.add("hidden");
-    } else {
-        noAnnouncementsMessage.classList.remove("hidden");
     }
-   noAllMessage.classList.add("hidden"); 
-});
 
+    function toggleUnreadAnnouncements() {
+        showUnreadMode = !showUnreadMode;
+        let hasUnread = false;
 
-showAllBtn.addEventListener("click", function () {
-let hasData = false;
-showUnreadAllMode=false;
-showUnreadMode=false;
-cardMap.forEach((card) => {
-    card.classList.remove("hidden");
-    hasData = true; // ✅ Mark as having data
-});
+        cardMap.forEach(({ original, clone }, id) => {
+            const notification = notificationData.find(n => Number(n.ID) === id);
+            if (!notification) return;
 
-// ✅ Show "No Messages" if no notifications exist
-if (hasData) {
-    noAllMessage.classList.add("hidden");
-} else {
-    noAllMessage.classList.remove("hidden");
-}
-noAnnouncementsMessage.classList.add("hidden");
-});
+            if (notification.Type === "Announcement") {
+                const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
 
+                [original, clone].forEach((card) => {
+                    if (card) {
+                        card.classList.toggle("hidden", showUnreadMode && !isUnread);
+                    }
+                });
 
+                if (isUnread) hasUnread = true;
+            }
+        });
 
-// ✅ Toggle Unread Announcements on Click
-
-showUnreadAnnounceBtn.addEventListener("click", function () {
-showUnreadMode = !showUnreadMode; // Toggle the mode
-
-let hasUnread = false;
-
-cardMap.forEach((card, id) => {
-  const notification = notificationData.find(n => Number(n.ID) === id);
-  if (!notification) return;
-
-  if (notification.Type === "Announcement") {
-      if (showUnreadMode) {
-          // ✅ Show only unread announcements
-          if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
-              card.classList.remove("hidden");
-              hasUnread = true;
-          } else {
-              card.classList.add("hidden");
-          }
-      } else {
-          // ✅ Restore all announcements
-          card.classList.remove("hidden");
-          hasUnread = true;
-      }
-  }
-});
-
-// ✅ Show/Hide "No unread announcements available" message
-noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
-
-});
-
-
-// ✅ Toggle Unread Notifications (Without Checking Type)
-
-
-showUnreadAllNotification.addEventListener("click", function () {
-showUnreadAllMode = !showUnreadAllMode; // Toggle the mode
-
-let hasUnread = false;
-
-cardMap.forEach((card) => {
-    if (showUnreadAllMode) {
-        // ✅ Show only unread notifications (without type check)
-        if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
-            card.classList.remove("hidden");
-            hasUnread = true;
-        } else {
-            card.classList.add("hidden");
-        }
-    } else {
-        // ✅ Restore all notifications
-        card.classList.remove("hidden");
-        hasUnread = true;
+        noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
     }
-});
-noAllMessage.classList.toggle("hidden", hasUnread);
-});
 
+    function toggleUnreadNotifications() {
+        showUnreadAllMode = !showUnreadAllMode;
+        let hasUnread = false;
 
+        cardMap.forEach(({ original, clone }) => {
+            const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
 
+            [original, clone].forEach((card) => {
+                if (card) {
+                    card.classList.toggle("hidden", showUnreadAllMode && !isUnread);
+                }
+            });
+
+            if (isUnread) hasUnread = true;
+        });
+
+        noAllMessage.classList.toggle("hidden", hasUnread);
+    }
+
+    // Attach event listeners
+    onlySeeBtn.addEventListener("click", () => toggleVisibilityByType("Announcement"));
+    showAllBtn.addEventListener("click", toggleVisibilityAll);
+    showUnreadAnnounceBtn.addEventListener("click", toggleUnreadAnnouncements);
+    showUnreadAllNotification.addEventListener("click", toggleUnreadNotifications);
 });
 
 initializeSocket();
