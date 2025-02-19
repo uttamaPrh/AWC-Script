@@ -368,6 +368,7 @@ function toggleVisibilityByType(type) {
 function toggleUnreadAnnouncements() {
     showUnreadMode = !showUnreadMode;
     let hasUnread = false;
+    let hasVisible = false;
 
     cardMap.forEach(({ original }, id) => {
         const notification = notificationData.find(n => Number(n.ID) === id);
@@ -378,35 +379,43 @@ function toggleUnreadAnnouncements() {
 
             if (original) {
                 original.classList.toggle("hidden", showUnreadMode && !isUnread);
+                if (!original.classList.contains("hidden")) {
+                    hasVisible = true;
+                }
             }
 
             if (isUnread) hasUnread = true;
         }
     });
 
-    // ✅ Hide "No Messages" and show "No Announcements" only when necessary
-    noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
-    noAllMessage.classList.add("hidden"); // Ensure general "No Messages" is hidden when viewing announcements
+    // ✅ Show/Hide "No Announcements" correctly
+    noAnnouncementsMessage.classList.toggle("hidden", hasVisible);
+    noAllMessage.classList.add("hidden"); // Hide general "No Messages" when viewing announcements
 }
 
 function toggleUnreadNotifications() {
     showUnreadAllMode = !showUnreadAllMode;
     let hasUnread = false;
+    let hasVisible = false;
 
     cardMap.forEach(({ original }) => {
         const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
 
         if (original) {
             original.classList.toggle("hidden", showUnreadAllMode && !isUnread);
+            if (!original.classList.contains("hidden")) {
+                hasVisible = true;
+            }
         }
 
         if (isUnread) hasUnread = true;
     });
 
-    // ✅ Hide "No Announcements" and show "No Messages" only when necessary
-    noAllMessage.classList.toggle("hidden", hasUnread);
-    noAnnouncementsMessage.classList.add("hidden"); // Ensure announcement message is hidden when viewing all
+    // ✅ Show/Hide "No Messages" correctly
+    noAllMessage.classList.toggle("hidden", hasVisible);
+    noAnnouncementsMessage.classList.add("hidden"); // Hide "No Announcements" when viewing all
 }
+
 
 
     onlySeeBtn.addEventListener("click", () => toggleVisibilityByType("Announcement"));
