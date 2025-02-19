@@ -326,12 +326,14 @@ document.addEventListener("DOMContentLoaded", function () {
         let hasUnread = false;
 
         cardMap.forEach((card) => {
+          if (notification.Type === "Announcement") {
             if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
                 card.classList.remove("hidden"); // ✅ Show unread
                 hasUnread = true;
             } else {
                 card.classList.add("hidden"); // ✅ Hide read
             }
+          }
         });
 
         noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
