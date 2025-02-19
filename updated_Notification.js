@@ -322,23 +322,45 @@ document.addEventListener("DOMContentLoaded", function () {
         noAnnouncementsMessage.classList.add("hidden");
     });
     // ✅ Show only unread announcements
-    showUnreadAnnounceBtn.addEventListener("click", function () {
-        let hasUnread = false;
+showUnreadAnnounceBtn.addEventListener("click", function () {
+  let hasUnread = false;
+  let anyHidden = false;
 
-        cardMap.forEach((card, id) => {
-           const notification = notificationData.find(n => Number(n.ID) === id);
-          if (notification.Type === "Announcement") {
-            if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
-                card.classList.remove("hidden"); // ✅ Show unread
-                hasUnread = true;
-            } else {
-                card.classList.add("hidden"); // ✅ Hide read
-            }
+  // Check if any unread announcements are currently hidden
+  cardMap.forEach((card, id) => {
+      const notification = notificationData.find(n => Number(n.ID) === id);
+      if (!notification) return;
+
+      if (notification.Type === "Announcement") {
+          if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
+              if (card.classList.contains("hidden")) {
+                  anyHidden = true; // Found a hidden unread notification
+              }
           }
-        });
+      }
+  });
 
-        noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
-    });
+  // Toggle visibility based on whether any unread announcements are currently hidden
+  cardMap.forEach((card, id) => {
+      const notification = notificationData.find(n => Number(n.ID) === id);
+      if (!notification) return;
+
+      if (notification.Type === "Announcement") {
+          if (card.querySelector(".notification-content").classList.contains("bg-unread")) {
+              if (anyHidden) {
+                  card.classList.remove("hidden"); // ✅ Show unread if any are hidden
+                  hasUnread = true;
+              } else {
+                  card.classList.add("hidden"); // ✅ Hide unread if all were visible
+              }
+          }
+      }
+  });
+
+  // Toggle "No unread announcements available" message
+  noAnnouncementsMessage.classList.toggle("hidden", hasUnread);
+});
+
 });
 
 initializeSocket();
