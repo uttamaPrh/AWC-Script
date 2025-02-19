@@ -174,7 +174,6 @@ return card;
 
 
 // ✅ Process and append notification
-
 function processNotification(notification) {
     const container1 = document.getElementById("parentNotificationTemplatesInBody"); // First container
     const container2 = document.getElementById("secondaryNotificationContainer"); // Second container
@@ -189,61 +188,68 @@ function processNotification(notification) {
     // Append to the first container
     container1.appendChild(card);
     
-    // Clone the card and append to the second container
-    const cardClone = card.cloneNode(true);
+    // Clone and reattach event listeners
+    const cardClone = createNotificationCard(notification, isRead);
     container2.appendChild(cardClone);
     
-    // Store in cardMap
-    cardMap.set(id, card);
+    // Store in cardMap for both cards
+    cardMap.set(id, { original: card, clone: cardClone });
 }
+
 
 
 // ✅ Update read status UI
 function updateNotificationReadStatus() {
-cardMap.forEach((card, id) => {
-    if (readAnnouncements.has(id)) {
-        card.querySelector(".notification-content").classList.remove("bg-unread");
-        card.querySelector(".notification-content").classList.add("bg-white");
-    }
-});
+    cardMap.forEach((cards, id) => {
+        if (readAnnouncements.has(id)) {
+            [cards.original, cards.clone].forEach((card) => {
+                if (card) {
+                    card.querySelector(".notification-content").classList.remove("bg-unread");
+                    card.querySelector(".notification-content").classList.add("bg-white");
+                }
+            });
+        }
+    });
 }
+
 
 // ✅ Mark a single notification as read
 function markAsRead(announcementId) {
-if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
-pendingAnnouncements.add(announcementId);
+    if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
+    pendingAnnouncements.add(announcementId);
 
-const variables = {
-    payload: {
-        read_announcement_id: announcementId,
-        read_contact_id: LOGGED_IN_CONTACT_ID,
-    },
-};
+    const variables = {
+        payload: {
+            read_announcement_id: announcementId,
+            read_contact_id: LOGGED_IN_CONTACT_ID,
+        },
+    };
 
-fetch(HTTP_ENDPOINT, {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "Api-Key": APIii_KEY,
-    },
-    body: JSON.stringify({
-        query: MARK_READ_MUTATION,
-        variables: variables,
-    }),
-})
-.then((response) => response.json())
-.then((data) => {
-    pendingAnnouncements.delete(announcementId);
-    if (data.data && data.data.createOReadContactReadAnnouncement) {
-        readAnnouncements.add(announcementId);
-        updateNotificationReadStatus();
-    }
-})
-.catch((error) => {
-    pendingAnnouncements.delete(announcementId);
-    console.error("Error marking notification as read:", error);
-});
+    fetch(HTTP_ENDPOINT, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Api-Key": APIii_KEY,
+        },
+        body: JSON.stringify({
+            query: MARK_READ_MUTATION,
+            variables: variables,
+        }),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        pendingAnnouncements.delete(announcementId);
+        if (data.data && data.data.createOReadContactReadAnnouncement) {
+            readAnnouncements.add(announcementId);
+            updateNotificationReadStatus();
+        }
+    })
+    .catch((error) => {
+        pendingAnnouncements.delete(announcementId);
+        console.error("Error marking notification as read:", error);
+    });
 }
+
 
 // ✅ Mark all unread notifications as read
 function markAllAsRead() {
