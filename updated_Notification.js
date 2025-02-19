@@ -217,7 +217,7 @@ function updateNotificationReadStatus() {
 
 
 // ✅ Mark a single notification as read
-function markAsRead(announcementId) {
+async function markAsRead(announcementId) {
     if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
     pendingAnnouncements.add(announcementId);
 
@@ -228,44 +228,67 @@ function markAsRead(announcementId) {
         },
     };
 
-    fetch(HTTP_ENDPOINT, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Api-Key": APIii_KEY,
-        },
-        body: JSON.stringify({
-            query: MARK_READ_MUTATION,
-            variables: variables,
-        }),
-    })
-    .then((response) => response.json())
-    .then((data) => {
+    try {
+        const response = await fetch(HTTP_ENDPOINT, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Api-Key": APIii_KEY,
+            },
+            body: JSON.stringify({
+                query: MARK_READ_MUTATION,
+                variables: variables,
+            }),
+        });
+
+        const data = await response.json();
         pendingAnnouncements.delete(announcementId);
+
         if (data.data && data.data.createOReadContactReadAnnouncement) {
             readAnnouncements.add(announcementId);
             updateNotificationReadStatus();
+            updateMarkAllReadVisibility(); // ✅ Check if "Mark All Read" should be hidden
         }
-    })
-    .catch((error) => {
+    } catch (error) {
         pendingAnnouncements.delete(announcementId);
-        console.error("Error marking notification as read:", error);
-    });
+        console.error("❌ Error marking notification as read:", error);
+    }
 }
 
+
+function updateMarkAllReadVisibility() {
+    let hasUnread = [...cardMap.keys()].some(id => !readAnnouncements.has(id));
+
+    // ✅ Select all elements with class "hideMarkAllReadIfAllRead"
+    const markAllReadElements = document.querySelectorAll(".hideMarkAllReadIfAllRead");
+
+    // ✅ Hide or show based on unread status
+    markAllReadElements.forEach(el => {
+        el.classList.toggle("hidden", !hasUnread);
+    });
+
+    console.log(hasUnread ? "🔄 Unread notifications exist, showing 'Mark All Read'." : "✅ All notifications read, hiding 'Mark All Read'.");
+}
 
 // ✅ Mark all unread notifications as read
 function markAllAsRead() {
-console.log("Marking all unread notifications as read...");
+    console.log("✅ Marking all unread notifications as read...");
 
-notificationIDs.forEach(id => {
-    if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
-        markAsRead(id);
-    }
-});
+    let hasUnread = false;
 
-console.log("Unread notifications marked as read.");
+    cardMap.forEach((cards, id) => {
+        if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
+            hasUnread = true;
+            markAsRead(id);
+        }
+    });
+
+    console.log("✅ All unread notifications marked as read.");
+
+    // ✅ Hide "Mark All Read" elements if no unread notifications exist
+    updateMarkAllReadVisibility();
 }
+
 
 // ✅ Attach event listener to your existing "Mark All Read" button
 document.addEventListener("DOMContentLoaded", () => {
@@ -546,6 +569,10 @@ document.addEventListener("DOMContentLoaded", function () {
     showAllBtnSec.addEventListener("click", toggleVisibilityAllSec);
     showUnreadAnnounceBtnSec.addEventListener("click", toggleUnreadAnnouncementsSec);
     showUnreadAllNotificationSec.addEventListener("click", toggleUnreadNotificationsSec);
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    updateMarkAllReadVisibility(); // ✅ Check on page load
 });
 
 initializeSocket();
