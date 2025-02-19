@@ -428,125 +428,125 @@ function toggleUnreadNotifications() {
 
 //for View All Notification
 document.addEventListener("DOMContentLoaded", function () {
-    function attachSecondaryEventListeners() {
-        const onlySeeBtnSec = document.getElementById("OnlyseeAnnouncementsSec");
-        const noAllMessageSec = document.getElementById("noAllMessageSec");
-        const showAllBtnSec = document.getElementById("allAnnouncementsSec");
-        const noAnnouncementsMessageSec = document.getElementById("noAnnouncementsMessageSec");
-        const showUnreadAnnounceBtnSec = document.getElementById("showUnreadAnnouncementSec");
-        const showUnreadAllNotificationSec = document.getElementById("showUnreadAllNotificationSec");
-        const secondaryContainer = document.getElementById("secondaryNotificationContainerSec");
+    const onlySeeBtnSec = document.getElementById("OnlyseeAnnouncementsSec");
+    const noAllMessageSec = document.getElementById("noAllMessageSec");
+    const showAllBtnSec = document.getElementById("allAnnouncementsSec");
+    const noAnnouncementsMessageSec = document.getElementById("noAnnouncementsMessageSec");
+    const showUnreadAnnounceBtnSec = document.getElementById("showUnreadAnnouncementSec");
+    const showUnreadAllNotificationSec = document.getElementById("showUnreadAllNotificationSec");
 
-        if (!secondaryContainer) {
-            console.warn("Secondary container not found. Retrying event attachment...");
-            return;
-        }
+    let showUnreadModeSec = false;
+    let showUnreadAllModeSec = false;
 
-        let showUnreadModeSec = false;
-        let showUnreadAllModeSec = false;
+    // ✅ Function to check if notifications are visible and update the "No Messages" display
+    function updateNoNotificationMessagesSec() {
+        const hasVisible = [...cardMap.values()].some(({ clone }) => clone && !clone.classList.contains("hidden"));
 
-        function updateNoNotificationMessagesSec() {
-            const hasVisible = [...cardMap.values()].some(({ clone }) => clone && !clone.classList.contains("hidden"));
-            if (noAllMessageSec) noAllMessageSec.classList.toggle("hidden", hasVisible);
-            if (noAnnouncementsMessageSec) noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
-        }
-
-        function toggleVisibilityByTypeSec(type) {
-            let hasAnnouncements = false;
-            showUnreadAllModeSec = false;
-            showUnreadModeSec = false;
-
-            cardMap.forEach(({ clone }, id) => {
-                const notification = notificationData.find(n => Number(n.ID) === id);
-                if (!notification) return;
-                const shouldShow = notification.Type === type;
-                if (clone) {
-                    clone.classList.toggle("hidden", !shouldShow);
-                    if (shouldShow) hasAnnouncements = true;
-                }
-            });
-
-            if (noAnnouncementsMessageSec) noAnnouncementsMessageSec.classList.toggle("hidden", hasAnnouncements);
-            if (noAllMessageSec) noAllMessageSec.classList.add("hidden");
-        }
-
-        function toggleVisibilityAllSec() {
-            let hasData = false;
-            showUnreadAllModeSec = false;
-            showUnreadModeSec = false;
-
-            cardMap.forEach(({ clone }) => {
-                if (clone) {
-                    clone.classList.remove("hidden");
-                    hasData = true;
-                }
-            });
-
-            if (noAllMessageSec) noAllMessageSec.classList.toggle("hidden", hasData);
-            if (noAnnouncementsMessageSec) noAnnouncementsMessageSec.classList.add("hidden");
-        }
-
-        function toggleUnreadAnnouncementsSec() {
-            showUnreadModeSec = !showUnreadModeSec;
-            let hasUnread = false;
-            let hasVisible = false;
-
-            cardMap.forEach(({ clone }, id) => {
-                const notification = notificationData.find(n => Number(n.ID) === id);
-                if (!notification) return;
-                if (notification.Type === "Announcement") {
-                    const isUnread = clone?.querySelector(".notification-content")?.classList.contains("bg-unread");
-                    if (clone) {
-                        clone.classList.toggle("hidden", showUnreadModeSec && !isUnread);
-                        if (!clone.classList.contains("hidden")) hasVisible = true;
-                    }
-                    if (isUnread) hasUnread = true;
-                }
-            });
-
-            if (noAnnouncementsMessageSec) noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
-            if (noAllMessageSec) noAllMessageSec.classList.add("hidden");
-        }
-
-        function toggleUnreadNotificationsSec() {
-            showUnreadAllModeSec = !showUnreadAllModeSec;
-            let hasUnread = false;
-            let hasVisible = false;
-
-            cardMap.forEach(({ clone }) => {
-                const isUnread = clone?.querySelector(".notification-content")?.classList.contains("bg-unread");
-                if (clone) {
-                    clone.classList.toggle("hidden", showUnreadAllModeSec && !isUnread);
-                    if (!clone.classList.contains("hidden")) hasVisible = true;
-                }
-                if (isUnread) hasUnread = true;
-            });
-
-            if (noAllMessageSec) noAllMessageSec.classList.toggle("hidden", hasVisible);
-            if (noAnnouncementsMessageSec) noAnnouncementsMessageSec.classList.add("hidden");
-        }
-
-        // ✅ Attach event listeners only if elements exist
-        if (onlySeeBtnSec) onlySeeBtnSec.addEventListener("click", () => toggleVisibilityByTypeSec("Announcement"));
-        if (showAllBtnSec) showAllBtnSec.addEventListener("click", toggleVisibilityAllSec);
-        if (showUnreadAnnounceBtnSec) showUnreadAnnounceBtnSec.addEventListener("click", toggleUnreadAnnouncementsSec);
-        if (showUnreadAllNotificationSec) showUnreadAllNotificationSec.addEventListener("click", toggleUnreadNotificationsSec);
-
-        console.log("✅ Secondary event listeners attached successfully.");
+        noAllMessageSec.classList.toggle("hidden", hasVisible);
+        noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
     }
 
-    // ✅ Attach event listeners immediately if elements exist
-    attachSecondaryEventListeners();
+    // ✅ Show only Announcements (Secondary)
+    function toggleVisibilityByTypeSec(type) {
+        let hasAnnouncements = false;
 
-    // ✅ Use MutationObserver to detect when secondary elements are added dynamically
-    const observer = new MutationObserver(() => {
-        if (document.getElementById("secondaryNotificationContainerSec")) {
-            attachSecondaryEventListeners();
-            observer.disconnect(); // Stop observing once events are attached
-        }
-    });
+        showUnreadAllModeSec = false;
+        showUnreadModeSec = false;
 
-    observer.observe(document.body, { childList: true, subtree: true });
+        cardMap.forEach(({ clone }, id) => {
+            const notification = notificationData.find(n => Number(n.ID) === id);
+            if (!notification) return;
+
+            const shouldShow = notification.Type === type;
+            if (clone) {
+                clone.classList.toggle("hidden", !shouldShow);
+            }
+
+            if (shouldShow) hasAnnouncements = true;
+        });
+
+        // ✅ Correctly toggle "No Announcements" message
+        noAnnouncementsMessageSec.classList.toggle("hidden", hasAnnouncements);
+        noAllMessageSec.classList.add("hidden"); // Hide "No Messages" when viewing announcements
+    }
+
+    // ✅ Show all notifications (Secondary)
+    function toggleVisibilityAllSec() {
+        let hasData = false;
+
+        showUnreadAllModeSec = false;
+        showUnreadModeSec = false;
+
+        cardMap.forEach(({ clone }) => {
+            if (clone) {
+                clone.classList.remove("hidden");
+                hasData = true;
+            }
+        });
+
+        // ✅ Correctly toggle "No Messages" message
+        noAllMessageSec.classList.toggle("hidden", hasData);
+        noAnnouncementsMessageSec.classList.add("hidden"); // Hide "No Announcements" when viewing all
+    }
+
+    // ✅ Toggle Unread Announcements (Secondary)
+    function toggleUnreadAnnouncementsSec() {
+        showUnreadModeSec = !showUnreadModeSec;
+        let hasUnread = false;
+        let hasVisible = false;
+
+        cardMap.forEach(({ clone }, id) => {
+            const notification = notificationData.find(n => Number(n.ID) === id);
+            if (!notification) return;
+
+            if (notification.Type === "Announcement") {
+                const isUnread = clone?.querySelector(".notification-content")?.classList.contains("bg-unread");
+
+                if (clone) {
+                    clone.classList.toggle("hidden", showUnreadModeSec && !isUnread);
+                    if (!clone.classList.contains("hidden")) {
+                        hasVisible = true;
+                    }
+                }
+
+                if (isUnread) hasUnread = true;
+            }
+        });
+
+        // ✅ Correctly toggle "No Announcements" message
+        noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
+        noAllMessageSec.classList.add("hidden"); // Hide "No Messages" when viewing announcements
+    }
+
+    // ✅ Toggle Unread Notifications (Secondary)
+    function toggleUnreadNotificationsSec() {
+        showUnreadAllModeSec = !showUnreadAllModeSec;
+        let hasUnread = false;
+        let hasVisible = false;
+
+        cardMap.forEach(({ clone }) => {
+            const isUnread = clone?.querySelector(".notification-content")?.classList.contains("bg-unread");
+
+            if (clone) {
+                clone.classList.toggle("hidden", showUnreadAllModeSec && !isUnread);
+                if (!clone.classList.contains("hidden")) {
+                    hasVisible = true;
+                }
+            }
+
+            if (isUnread) hasUnread = true;
+        });
+
+        // ✅ Correctly toggle "No Messages" message
+        noAllMessageSec.classList.toggle("hidden", hasVisible);
+        noAnnouncementsMessageSec.classList.add("hidden"); // Hide "No Announcements" when viewing all
+    }
+
+    // ✅ Attach event listeners for Secondary filtering
+    onlySeeBtnSec.addEventListener("click", () => toggleVisibilityByTypeSec("Announcement"));
+    showAllBtnSec.addEventListener("click", toggleVisibilityAllSec);
+    showUnreadAnnounceBtnSec.addEventListener("click", toggleUnreadAnnouncementsSec);
+    showUnreadAllNotificationSec.addEventListener("click", toggleUnreadNotificationsSec);
 });
 
 initializeSocket();
