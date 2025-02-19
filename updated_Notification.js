@@ -139,7 +139,6 @@ classIds.forEach(connect);
 function createNotificationCard(notification, isRead) {
 const card = document.createElement("div");
 card.className = "notification-card cursor-pointer";
-
 card.innerHTML = `
     <div class="p-2 flex items-start gap-2 rounded justify-between notification-content w-full ${isRead ? "bg-white" : "bg-unread"}">
         <div class="flex flex-col gap-1">
