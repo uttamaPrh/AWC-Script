@@ -105,7 +105,7 @@ function calculateOpenDate(startDateUnix, weeks) {
 
 function isOpenDateValid(startDateUnix, weeks) {
     if (!startDateUnix) return false;
-    if (weeks === 0 || weeks === null) return true; // Unlocked case
+    if (weeks === 0 || weeks === null) return false; // Unlocked case
 
     const openDateUnix = startDateUnix + (weeks * 7 * 24 * 60 * 60);
     const todayUnix = Math.floor(Date.now() / 1000); // Get today's date in Unix timestamp
