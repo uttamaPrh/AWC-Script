@@ -140,7 +140,7 @@ function createNotificationCard(notification, isRead) {
 const card = document.createElement("div");
 card.className = "notification-card cursor-pointer";
 card.innerHTML = `
-    <div class="p-2 flex items-start gap-2 rounded justify-between notification-content w-full ${isRead ? "bg-white" : "bg-unread"}">
+    <div class="p-2  items-start gap-2 rounded justify-between notification-content w-full ${isRead ? "bg-white" : "bg-unread"} ${Status==="Published" ? "flex":"hidden" }">
         <div class="flex flex-col gap-1">
             <div class="text-[#414042] text-xs font-semibold">${notification.Title}</div>
             <div class="extra-small-text text-dark line-clamp-2">“${notification.Content}”-(${notification.Class_Class_Name})</div>
