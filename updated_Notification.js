@@ -363,7 +363,7 @@ function updateNoNotificationMessagesSec() {
     const hasVisible = [...cardMap.values()].some(({ clone }) =>  clone && !clone.classList.contains("hidden")
     );
     noAllMessageSec.classList.toggle("hidden", hasVisible);
-    noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
+    noAnnouncementsMessageSec.classList.add("hidden");
 }
 
 // ✅ Filter announcements only
