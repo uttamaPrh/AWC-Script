@@ -215,7 +215,7 @@ function updateNotificationReadStatus() {
     });
 }
 
-function updateNotificationVisibility() {
+function updateMarkAllReadVisibility() {
     let hasUnread = false;
     cardMap.forEach(({ original }) => {
         if (original && original.querySelector(".notification-content").classList.contains("bg-unread")) {
