@@ -603,10 +603,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ✅ Attach event listeners for Secondary filtering
-    onlySeeBtnSec.addEventListener("click", () => toggleVisibilityByTypeSec("Announcement"));
-    showAllBtnSec.addEventListener("click", toggleVisibilityAllSec);
-    showUnreadAnnounceBtnSec.addEventListener("click", toggleUnreadAnnouncementsSec);
-    showUnreadAllNotificationSec.addEventListener("click", toggleUnreadNotificationsSec);
+    // onlySeeBtnSec.addEventListener("click", () => toggleVisibilityByTypeSec("Announcement"));
+    // showAllBtnSec.addEventListener("click", toggleVisibilityAllSec);
+    // showUnreadAnnounceBtnSec.addEventListener("click", toggleUnreadAnnouncementsSec);
+    // showUnreadAllNotificationSec.addEventListener("click", toggleUnreadNotificationsSec);
+
+if (onlySeeBtnSec) {
+        onlySeeBtnSec.addEventListener("click", () => toggleVisibilityByTypeSec("Announcement"));
+    }
+    if (showAllBtnSec) {
+        showAllBtnSec.addEventListener("click", toggleVisibilityAllSec);
+    }
+    if (showUnreadAnnounceBtnSec) {
+        showUnreadAnnounceBtnSec.addEventListener("click", toggleUnreadAnnouncementsSec);
+    }
+    if (showUnreadAllNotificationSec) {
+        showUnreadAllNotificationSec.addEventListener("click", toggleUnreadNotificationsSec);
+    }
+  
 });
 
 document.addEventListener("DOMContentLoaded", function () {
