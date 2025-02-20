@@ -196,6 +196,8 @@ function processNotification(notification) {
 
     // Store both the original and cloned cards in cardMap (if cloned)
     cardMap.set(id, { original: card, clone: cardClone });
+    updateNoNotificationMessages(); 
+    updateNoNotificationMessagesSec();
 }
 
 
@@ -261,8 +263,11 @@ async function markAsRead(announcementId) {
         pendingAnnouncements.delete(announcementId);
         if (data.data && data.data.createOReadContactReadAnnouncement) {
             readAnnouncements.add(announcementId);
+
             updateNotificationReadStatus();
-            updateMarkAllReadVisibility(); // ✅ Ensures the button hides if all notifications are read
+            updateMarkAllReadVisibility(); 
+            updateNoNotificationMessages(); 
+            updateNoNotificationMessagesSec();
         }
     } catch (error) {
         pendingAnnouncements.delete(announcementId);
@@ -290,6 +295,8 @@ function markAllAsRead() {
 
     // ✅ Hide "Mark All Read" elements if no unread notifications exist
     updateMarkAllReadVisibility();
+    updateNoNotificationMessages(); 
+    updateNoNotificationMessagesSec();
 }
 
 
@@ -323,7 +330,9 @@ if (data.data && data.data.calcOReadContactReadAnnouncements) {
             readAnnouncements.add(Number(record.Read_Announcement_ID));
         }
     });
-    updateNotificationReadStatus();
+            updateNotificationReadStatus();
+            updateNoNotificationMessages(); 
+            updateNoNotificationMessagesSec();
 }
 })
 .catch((error) => {
