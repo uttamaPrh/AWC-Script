@@ -341,16 +341,19 @@ console.error("Error fetching read data:", error);
 }
 
 
-
 function updateNoNotificationMessages() {
     const noAllMessage = document.getElementById("noAllMessage");
     const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
     if (!noAllMessage || !noAnnouncementsMessage) return; // Ensure elements exist
-    const visibleCards = [...cardMap.values()].filter(({ original }) => original && !original.classList.contains("hidden")
+
+    const visibleCards = [...cardMap.values()].filter(({ original }) => 
+        original && !original.classList.contains("hidden")
     );
-    noAllMessage.classList.toggle("hidden", visibleCards.length > 0);
-    noAnnouncementsMessage.classList.toggle("hidden", visibleCards.length > 0);
+    const hasNotifications = visibleCards.length > 0;
+    noAllMessage.classList.toggle("hidden", hasNotifications);
+    noAnnouncementsMessage.classList.add("hidden");
 }
+
 
 // ✅ Also move this function outside DOMContentLoaded
 function updateNoNotificationMessagesSec() {
