@@ -215,7 +215,7 @@ function updateNotificationReadStatus() {
     });
 }
 
-function updateMarkAllReadVisibility() {
+function updateNotificationVisibility() {
     let hasUnread = false;
     cardMap.forEach(({ original }) => {
         if (original && original.querySelector(".notification-content").classList.contains("bg-unread")) {
@@ -223,16 +223,14 @@ function updateMarkAllReadVisibility() {
         }
     });
     const markAllReadElements = document.querySelectorAll(".hideMarkAllReadIfAllRead");
+    const redDot = document.getElementById("redDot");
     markAllReadElements.forEach(el => {
         el.classList.toggle("hidden", !hasUnread);
     });
-    console.log(hasUnread ? "🔄 Unread notifications exist, showing 'Mark All Read' button." : "✅ All notifications read, hiding 'Mark All Read' button.");
+    if (redDot) {
+        redDot.classList.toggle("hidden", !hasUnread);
+    }
 }
-
-
-
-
-
 
 // ✅ Mark a single notification as read
 async function markAsRead(announcementId) {
