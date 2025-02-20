@@ -103,6 +103,15 @@ function calculateOpenDate(startDateUnix, weeks) {
     return `Unlocks in ${formatDate(openDateUnix)}`;
 }
 
+function isOpenDateValid(startDateUnix, weeks) {
+    if (!startDateUnix) return false;
+    if (weeks === 0 || weeks === null) return true; // Unlocked case
+
+    const openDateUnix = startDateUnix + (weeks * 7 * 24 * 60 * 60);
+    const todayUnix = Math.floor(Date.now() / 1000); // Get today's date in Unix timestamp
+
+    return openDateUnix >= todayUnix;
+}
 // Function to fetch lesson statuses
 async function fetchLessonStatuses() {
     const completedLessons = await fetchGraphQL(completedQuery);
@@ -153,6 +162,8 @@ async function combineModulesAndLessons() {
     // Initialize modules and ensure an empty Lessons array
     modules.forEach(module => {
         const openDateText = calculateOpenDate(module.Class_Start_Date, module.Week_Open_from_Start_Date);
+        const isAvailable = isOpenDateValid(module.Class_Start_Date, module.Week_Open_from_Start_Date);
+        console.log("Is Open Date Valid:", isAvailable);
         modulesMap[module.ID] = {
             ...module,
             Lessons: [],
