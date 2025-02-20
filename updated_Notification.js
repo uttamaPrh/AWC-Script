@@ -117,8 +117,8 @@ function connect(classId) {
             notificationIDs.add(Number(notification.ID)); // Store ID
             notificationData.push(notification);
         });
-
-        console.log("Stored Notification IDs:", [...notificationIDs]); // Debugging
+        updateMarkAllReadVisibility();
+      //  console.log("Stored Notification IDs:", [...notificationIDs]); // Debugging
     };
 
     socket.onclose = () => {
@@ -216,19 +216,19 @@ function updateNotificationReadStatus() {
 }
 
 function updateMarkAllReadVisibility() {
-    // ✅ Check if any card in primary or secondary has class "bg-unread"
-    let hasUnread = document.querySelector(".notification-content .bg-unread") !== null;
-
-    // ✅ Select all elements with class "hideMarkAllReadIfAllRead"
-    const markAllReadElements = document.querySelectorAll(".hideMarkAllReadIfAllRead");
-
-    // ✅ Toggle visibility based on unread status
-    markAllReadElements.forEach(el => {
-        el.classList.toggle("hidden", !hasUnread); // Show if any unread exists, hide if none exist
+    let hasUnread = false;
+    cardMap.forEach(({ original }) => {
+        if (original && original.querySelector(".notification-content").classList.contains("bg-unread")) {
+            hasUnread = true;
+        }
     });
-
+    const markAllReadElements = document.querySelectorAll(".hideMarkAllReadIfAllRead");
+    markAllReadElements.forEach(el => {
+        el.classList.toggle("hidden", !hasUnread);
+    });
     console.log(hasUnread ? "🔄 Unread notifications exist, showing 'Mark All Read' button." : "✅ All notifications read, hiding 'Mark All Read' button.");
 }
+
 
 
 
@@ -261,7 +261,6 @@ async function markAsRead(announcementId) {
 
         const data = await response.json();
         pendingAnnouncements.delete(announcementId);
-
         if (data.data && data.data.createOReadContactReadAnnouncement) {
             readAnnouncements.add(announcementId);
             updateNotificationReadStatus();
