@@ -158,11 +158,11 @@ card.addEventListener("click", async function () {
   }
 
   if (type === 'Comment' || type === 'Post') {
-      window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.EnrolmentID}&selectedTab=courseChat`;
+      window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}?selectedTab=chats`;
   } else if (type === 'Submissions') {
-      window.location.href = `https://courses.writerscentre.com.au/course-details/content/${notification.Lesson_Unique_ID1}?eid=${notification.EnrolmentID}`;
+      window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}`;
   } else {
-      window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.EnrolmentID}&selectedTab=anouncemnt`;
+      window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}?selectedTab=announcements`;
   }
 });
 
