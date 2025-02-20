@@ -340,6 +340,29 @@ console.error("Error fetching read data:", error);
 });
 }
 
+
+
+function updateNoNotificationMessages() {
+    const noAllMessage = document.getElementById("noAllMessage");
+    const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
+    if (!noAllMessage || !noAnnouncementsMessage) return; // Ensure elements exist
+    const visibleCards = [...cardMap.values()].filter(({ original }) => original && !original.classList.contains("hidden")
+    );
+    noAllMessage.classList.toggle("hidden", visibleCards.length > 0);
+    noAnnouncementsMessage.classList.toggle("hidden", visibleCards.length > 0);
+}
+
+// ✅ Also move this function outside DOMContentLoaded
+function updateNoNotificationMessagesSec() {
+    const noAllMessageSec = document.getElementById("noAllMessageSec");
+    const noAnnouncementsMessageSec = document.getElementById("noAnnouncementsMessageSec");
+    if (!noAllMessageSec || !noAnnouncementsMessageSec) return; // Ensure elements exist
+    const hasVisible = [...cardMap.values()].some(({ clone }) =>  clone && !clone.classList.contains("hidden")
+    );
+    noAllMessageSec.classList.toggle("hidden", hasVisible);
+    noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
+}
+
 // ✅ Filter announcements only
 document.addEventListener("DOMContentLoaded", function () {
     const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
@@ -352,11 +375,11 @@ document.addEventListener("DOMContentLoaded", function () {
     let showUnreadMode = false;
     let showUnreadAllMode = false;
 
-    function updateNoNotificationMessages() {
-        const visibleCards = [...cardMap.values()].filter(({ original }) => original && !original.classList.contains("hidden"));
-        noAllMessage.classList.toggle("hidden", visibleCards.length > 0);
-        noAnnouncementsMessage.classList.toggle("hidden", visibleCards.length > 0);
-    }
+    //function updateNoNotificationMessages() {
+     //   const visibleCards = [...cardMap.values()].filter(({ original }) => original && !original.classList.contains("hidden"));
+     //   noAllMessage.classList.toggle("hidden", visibleCards.length > 0);
+     //   noAnnouncementsMessage.classList.toggle("hidden", visibleCards.length > 0);
+    //}
 
    function toggleVisibilityAll() {
     let hasData = false;
@@ -473,12 +496,12 @@ document.addEventListener("DOMContentLoaded", function () {
     let showUnreadAllModeSec = false;
 
     // ✅ Function to check if notifications are visible and update the "No Messages" display
-    function updateNoNotificationMessagesSec() {
-        const hasVisible = [...cardMap.values()].some(({ clone }) => clone && !clone.classList.contains("hidden"));
+    // function updateNoNotificationMessagesSec() {
+    //     const hasVisible = [...cardMap.values()].some(({ clone }) => clone && !clone.classList.contains("hidden"));
 
-        noAllMessageSec.classList.toggle("hidden", hasVisible);
-        noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
-    }
+    //     noAllMessageSec.classList.toggle("hidden", hasVisible);
+    //     noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
+    // }
 
     // ✅ Show only Announcements (Secondary)
     function toggleVisibilityByTypeSec(type) {
@@ -585,6 +608,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
     updateMarkAllReadVisibility(); // ✅ Check on page load
+    updateNoNotificationMessages(); 
+    updateNoNotificationMessagesSec();
 });
 
 
