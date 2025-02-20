@@ -34,10 +34,10 @@ return "Just now";
 
 async function fetchClassIds() {
 const query = `
-query calcEnrolments {
-calcEnrolments(query: [{ where: { student_id: ${CONTACTss_ID} } }]) {
-  Class_ID: field(arg: ["class_id"])
-}
+query calcClasses {
+  calcClasses(query: [{ where: { teacher_id: ${CONTACTss_ID} } }]) {
+    ID: field(arg: ["id"])
+  }
 }
 `;
 
@@ -54,8 +54,8 @@ try {
   const result = await response.json();
   console.log('Class IDs:', result);
   
-  if (result.data && result.data.calcEnrolments) {
-      return result.data.calcEnrolments.map(enrolment => enrolment.Class_ID);
+  if (result.data && result.data.calcClasses) {
+      return result.data.calcClasses.map(cls => cls.ID);
   }
   return [];
 } catch (error) {
