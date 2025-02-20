@@ -167,7 +167,8 @@ async function combineModulesAndLessons() {
         modulesMap[module.ID] = {
             ...module,
             Lessons: [],
-            Open_Date_Text: openDateText
+            Open_Date_Text: openDateText,
+            isAvailable:isAvailable
         };
     });
 
@@ -218,6 +219,7 @@ async function combineModulesAndLessons() {
                     Course_Course_Access_Type: modulesMap[moduleId].Course_Course_Access_Type,
                     Module_Description: modulesMap[moduleId].Description,
                     Open_Date_Text: modulesMap[moduleId].Open_Date_Text,
+                    isAvailable:modulesMap[moduleId].isAvailable,
                     Week_Open_from_Start_Date: modulesMap[moduleId].Week_Open_from_Start_Date
                 });
             }
