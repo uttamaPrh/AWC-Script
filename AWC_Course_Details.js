@@ -451,6 +451,7 @@ async function combineModulesAndLessons() {
             // Push lesson into the module
             modulesMap[moduleId].Lessons.push({
                 ...lesson,
+                Lessons_Unique_ID:lesson.Unique_ID,
                 Lessons_Lesson_Name: lesson.Lesson_Name, // ✅ From new query
                 Lesson_AWC_Lesson_Content_Page_URL: lesson.AWC_Lesson_Content_Page_URL, // ✅ From new query
                 Lessons_Lesson_Length_in_Hour: lesson.Lesson_Length_in_Hour, // ✅ From new query
