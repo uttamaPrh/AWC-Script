@@ -327,8 +327,8 @@ async function combineModulesAndLessons() {
 
     // Create a set to track unique LessonsID
     const uniqueLessonsSet = new Set();
-
-    lessonsData.forEach(lesson => {
+    for (const lesson of lessonsData) {
+  //  lessonsData.forEach(lesson => {
         let moduleId = lesson.ID || lesson.LessonsID;
         if (modulesMap[moduleId]) {
             if (lesson.Lessons_Lesson_Name && !uniqueLessonsSet.has(lesson.LessonsID)) {
@@ -345,9 +345,10 @@ async function combineModulesAndLessons() {
                     status = "InProgress";
                 }
                let dueDateInfo = { dueDateUnix: null, dueDateText: "No Due Date" };
-               if (lesson.LessonsType === "Assessment") {
-               dueDateInfo = await determineAssessmentDueDate(lesson, modulesMap[moduleId].Class_Start_Date);
-                }
+            // ✅ Use `await` properly inside `for...of`
+            if (lesson.LessonsType === "Assessment") {
+                dueDateInfo = await determineAssessmentDueDate(lesson, modulesMap[moduleId].Class_Start_Date);
+            }
                 modulesMap[moduleId].Lessons.push({
                     ...lesson, 
                     Lesson_Name: lesson.Lessons_Lesson_Name,  // Lesson Name
@@ -421,12 +422,21 @@ async function renderModules() {
 }
 
 // Event Listeners
+// function addEventListenerIfExists(id, event, handler) {
+//     const element = document.getElementById(id);
+//     if (element) {
+//         element.addEventListener(event, handler);
+//     }
+// }
 function addEventListenerIfExists(id, event, handler) {
     const element = document.getElementById(id);
     if (element) {
-        element.addEventListener(event, handler);
+        element.addEventListener(event, async () => {
+            await handler();  // ✅ Fixed async execution
+        });
     }
 }
+
 
 addEventListenerIfExists("fetchModulesLessons", "click", renderModules);
 addEventListenerIfExists("fetchProgressModulesLessons", "click", renderModules);
