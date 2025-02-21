@@ -140,10 +140,13 @@ function determineAvailability(startDateUnix, weeks, customisation) {
         console.log("🛠 Customization Data Found:", customisation);
 
         if (customisation.Specific_Date) {
-            // Use the specific date as the open date
-            openDateUnix = Math.floor(new Date(customisation.Specific_Date).getTime() / 1000);
+            // Convert Specific Date (Detect if it's in milliseconds or seconds)
+            openDateUnix = customisation.Specific_Date > 9999999999 
+                ? Math.floor(customisation.Specific_Date / 1000)  // Convert from ms to s
+                : customisation.Specific_Date;  // Already in seconds
+
             openDateText = `Unlocks on ${formatDate(openDateUnix)}`;
-            console.log("📅 Using Specific Date from Customization:", openDateText);
+            console.log(`📅 Using Specific Date from Customization: ${openDateText} (Unix: ${openDateUnix})`);
         } else if (customisation.Days_to_Offset !== null) {
             // Apply offset logic
             console.log("🔄 Applying Offset Logic...");
@@ -166,6 +169,7 @@ function determineAvailability(startDateUnix, weeks, customisation) {
 
     return { isAvailable, openDateText };
 }
+
 
 
 // Function to fetch lesson statuses
