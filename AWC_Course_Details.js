@@ -116,6 +116,109 @@ async function fetchModuleCustomisation(moduleID) {
     
     return customisation;
 }
+//function to fetch lesson assessment due date
+// Function to fetch lesson customization for Assessments
+async function fetchLessonCustomisation(lessonID) {
+    console.log(`🔍 Fetching Customisation for Lesson ID: ${lessonID}`);
+
+    const customisationQuery = `
+        query {
+            calcClassCustomisations(
+                query: [
+                    { where: { lesson_to_modify_id: ${lessonID} } }
+                    {
+                        andWhere: {
+                            Lesson_to_Modify: [
+                                { where: { type: "Assessment" } }
+                            ]
+                        }
+                    }
+                ]
+                limit: 1
+                offset: 0
+                orderBy: [{ path: ["created_at"], type: desc }]
+            ) {
+                ID: field(arg: ["id"])
+                Date_Added: field(arg: ["created_at"])
+                Days_to_Offset: field(arg: ["days_to_offset"])
+                Specific_Date: field(arg: ["specific_date"])
+            }
+        }
+    `;
+
+    const response = await fetchGraphQL(customisationQuery);
+    const customisation = response?.calcClassCustomisations?.[0] || null;
+    
+    console.log(`📌 Lesson Customisation Data for Lesson ${lessonID}:`, customisation ? "✅ Available" : "❌ Not Available", customisation);
+
+    return customisation;
+}
+
+// Function to calculate the next Sunday from a given date
+function getUpcomingSunday(startDateUnix, weeksOffset = 0) {
+    const startDate = new Date(startDateUnix * 1000);
+    let nextSunday = new Date(startDate);
+    nextSunday.setDate(nextSunday.getDate() + (7 - nextSunday.getDay()) + (weeksOffset * 7));
+    return Math.floor(nextSunday.getTime() / 1000);
+}
+
+// Function to determine due date for Assessments only
+async function determineAssessmentDueDate(lesson, moduleStartDateUnix) {
+    const lessonID = lesson.LessonsID;
+    const dueWeek = lesson.Lessons_Assessment_Due_End_of_Week;
+    const customisation = await fetchLessonCustomisation(lessonID);
+
+    let dueDateUnix;
+    let dueDateText;
+
+    if (customisation) {
+        console.log(`🛠 Applying Lesson Customisation for Lesson ${lessonID}...`);
+
+        if (customisation.Specific_Date) {
+            dueDateUnix = customisation.Specific_Date > 9999999999
+                ? Math.floor(customisation.Specific_Date / 1000)
+                : customisation.Specific_Date;
+
+            dueDateText = `Due on ${formatDate(dueDateUnix)}`;
+            console.log(`📅 Using Specific Due Date: ${dueDateText} (Unix: ${dueDateUnix})`);
+        } else if (customisation.Days_to_Offset !== null) {
+            console.log("🔄 Applying Offset Logic for Due Date...");
+            console.log("🔹 Offset Days:", customisation.Days_to_Offset);
+
+            if (customisation.Days_to_Offset === 0) {
+                dueDateUnix = moduleStartDateUnix;
+            } else if (customisation.Days_to_Offset === -1) {
+                dueDateUnix = getUpcomingSunday(moduleStartDateUnix, 0) - (24 * 60 * 60);
+            } else if (customisation.Days_to_Offset === 1) {
+                dueDateUnix = getUpcomingSunday(moduleStartDateUnix, 1) + (24 * 60 * 60);
+            } else {
+                dueDateUnix = getUpcomingSunday(moduleStartDateUnix, customisation.Days_to_Offset);
+            }
+
+            dueDateText = `Due on ${formatDate(dueDateUnix)}`;
+            console.log(`📅 Due Date After Offset: ${dueDateText}`);
+        } else {
+            console.warn("⚠️ Customisation exists but has NO Specific Date or Offset. Using Default Logic.");
+            dueDateUnix = getUpcomingSunday(moduleStartDateUnix, dueWeek);
+            dueDateText = `Due on ${formatDate(dueDateUnix)}`;
+        }
+    } else {
+        console.log(`❌ No Customisation for Lesson ${lessonID}, applying default due date logic...`);
+        
+        if (dueWeek === 0) {
+            dueDateUnix = moduleStartDateUnix;
+        } else {
+            dueDateUnix = getUpcomingSunday(moduleStartDateUnix, dueWeek);
+        }
+
+        dueDateText = `Due on ${formatDate(dueDateUnix)}`;
+    }
+
+    console.log(`✅ Final Due Date Calculation: ${dueDateText}`);
+    return { dueDateUnix, dueDateText };
+}
+
+
 
 // Function to determine module availability
 function determineAvailability(startDateUnix, weeks, customisation) {
@@ -241,6 +344,10 @@ async function combineModulesAndLessons() {
                 } else if (isInProgress) {
                     status = "InProgress";
                 }
+               let dueDateInfo = { dueDateUnix: null, dueDateText: "No Due Date" };
+               if (lesson.LessonsType === "Assessment") {
+               dueDateInfo = await determineAssessmentDueDate(lesson, modulesMap[moduleId].Class_Start_Date);
+                }
                 modulesMap[moduleId].Lessons.push({
                     ...lesson, 
                     Lesson_Name: lesson.Lessons_Lesson_Name,  // Lesson Name
@@ -251,6 +358,7 @@ async function combineModulesAndLessons() {
                     Lesson_Length_in_Second: lesson.Lessons_Lesson_Length_in_Second,  // Length in Seconds
                     Lesson_Introduction_Text: lesson.Lessons_Lesson_Introduction_Text,  // Introduction Text
                     Lesson_Learning_Outcome: lesson.Lessons_Lesson_Learning_Outcome,  // Learning Outcome
+                    Due_Date_Text: dueDateInfo.dueDateText,
                     LessonsID: lesson.LessonsID,  // Lesson ID
                     Status: status,  // Lesson Status (Completed, InProgress, NotStarted)
                     Lessons_Your_Next_Step: lesson.Lessons_Your_Next_Step,  // Next Step Guidance
