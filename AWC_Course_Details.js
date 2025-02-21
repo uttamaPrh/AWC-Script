@@ -398,7 +398,7 @@ async function combineModulesAndLessons() {
     const lessonsData = lessonsResponse?.calcModules || [];
 
     if (!Array.isArray(modules) || !Array.isArray(lessonsData)) {
-        console.error("Modules or Lessons Data is not an array:", modules, lessonsData);
+        console.error("❌ Modules or Lessons Data is not an array:", modules, lessonsData);
         return [];
     }
 
@@ -423,61 +423,71 @@ async function combineModulesAndLessons() {
         };
     }
 
+    console.log("📌 Modules Map Created:", modulesMap);
+
     // Step 2: Map Lessons to Modules using `Lessons_Module_ID`
     const uniqueLessonsSet = new Set();
     for (const lesson of lessonsData) {
-        const moduleId = lesson.Lessons_Module_ID; // Correct mapping here
-        if (modulesMap[moduleId]) {
-            if (lesson.Lessons_Lesson_Name && !uniqueLessonsSet.has(lesson.LessonsID)) {
-                uniqueLessonsSet.add(lesson.LessonsID);
+        const moduleId = lesson.Lessons_Module_ID;
 
-                let status = "NotStarted";
-                const lessonID = lesson.LessonsID;
-                const isCompleted = lessonStatuses.completedSet.has(lessonID);
-                const isInProgress = lessonStatuses.inProgressSet.has(lessonID);
+        console.log(`🔍 Checking Lesson: ${lesson.Lessons_Lesson_Name} (Module ID: ${moduleId})`);
 
-                if (isCompleted) {
-                    status = "Completed";
-                } else if (isInProgress) {
-                    status = "InProgress";
-                }
+        if (!moduleId || !modulesMap[moduleId]) {
+            console.warn(`⚠️ Lesson '${lesson.Lessons_Lesson_Name}' has an invalid or missing module ID.`);
+            continue;
+        }
 
-                let dueDateInfo = { dueDateUnix: null, dueDateText: "No Due Date" };
-                if (lesson.LessonsType === "Assessment") {
-                    dueDateInfo = await determineAssessmentDueDate(lesson, modulesMap[moduleId].Class_Start_Date);
-                }
+        if (lesson.Lessons_Lesson_Name && !uniqueLessonsSet.has(lesson.LessonsID)) {
+            uniqueLessonsSet.add(lesson.LessonsID);
 
-                // Push the lesson into its corresponding module
-                modulesMap[moduleId].Lessons.push({
-                    ...lesson,
-                    Lesson_Name: lesson.Lessons_Lesson_Name,
-                    LessonsType: lesson.LessonsType,
-                    Lesson_AWC_Lesson_Content_Page_URL: lesson.Lesson_AWC_Lesson_Content_Page_URL,
-                    Lesson_Length_in_Hour: lesson.Lessons_Lesson_Length_in_Hour,
-                    Lesson_Length_in_Minute: lesson.Lesson_Lesson_Length_in_Minute,
-                    Lesson_Length_in_Second: lesson.Lesson_Lesson_Length_in_Second,
-                    Lesson_Introduction_Text: lesson.Lessons_Lesson_Introduction_Text,
-                    Lesson_Learning_Outcome: lesson.Lessons_Lesson_Learning_Outcome,
-                    Due_Date_Text: dueDateInfo.dueDateText,
-                    LessonsID: lesson.LessonsID,
-                    Status: status,
-                    Lessons_Your_Next_Step: lesson.Lessons_Your_Next_Step,
-                    Lessons_Join_Your_New_Community: lesson.Lessons_Join_Your_New_Community,
-                    Lessons_Give_Us_Your_Feedback: lesson.Lessons_Give_Us_Your_Feedback,
-                    Lessons_Download_Your_Certificate: lesson.Lessons_Download_Your_Certificate,
-                    Enrolment_Student_ID: lesson.Enrolment_Student_ID,
+            let status = "NotStarted";
+            const lessonID = lesson.LessonsID;
+            const isCompleted = lessonStatuses.completedSet.has(lessonID);
+            const isInProgress = lessonStatuses.inProgressSet.has(lessonID);
 
-                    // Module-level information
-                    Module_Name: modulesMap[moduleId].Module_Name,
-                    EnrolmentID: modulesMap[moduleId].EnrolmentID,
-                    Don_t_Track_Progress: modulesMap[moduleId].Don_t_Track_Progress,
-                    Course_Course_Access_Type: modulesMap[moduleId].Course_Course_Access_Type,
-                    Module_Description: modulesMap[moduleId].Description,
-                    Open_Date_Text: modulesMap[moduleId].Open_Date_Text,
-                    isAvailable: modulesMap[moduleId].isAvailable,
-                    Week_Open_from_Start_Date: modulesMap[moduleId].Week_Open_from_Start_Date,
-                });
+            if (isCompleted) {
+                status = "Completed";
+            } else if (isInProgress) {
+                status = "InProgress";
             }
+
+            let dueDateInfo = { dueDateUnix: null, dueDateText: "No Due Date" };
+            if (lesson.LessonsType === "Assessment") {
+                dueDateInfo = await determineAssessmentDueDate(lesson, modulesMap[moduleId].Class_Start_Date);
+            }
+
+            // Push the lesson into its corresponding module
+            modulesMap[moduleId].Lessons.push({
+                ...lesson,
+                Lesson_Name: lesson.Lessons_Lesson_Name,
+                LessonsType: lesson.LessonsType,
+                Lesson_AWC_Lesson_Content_Page_URL: lesson.Lesson_AWC_Lesson_Content_Page_URL,
+                Lesson_Length_in_Hour: lesson.Lessons_Lesson_Length_in_Hour,
+                Lesson_Length_in_Minute: lesson.Lesson_Lesson_Length_in_Minute,
+                Lesson_Length_in_Second: lesson.Lesson_Lesson_Length_in_Second,
+                Lesson_Introduction_Text: lesson.Lessons_Lesson_Introduction_Text,
+                Lesson_Learning_Outcome: lesson.Lessons_Lesson_Learning_Outcome,
+                Due_Date_Text: dueDateInfo.dueDateText,
+                LessonsID: lesson.LessonsID,
+                Status: status,
+                Lessons_Your_Next_Step: lesson.Lessons_Your_Next_Step,
+                Lessons_Join_Your_New_Community: lesson.Lessons_Join_Your_New_Community,
+                Lessons_Give_Us_Your_Feedback: lesson.Lessons_Give_Us_Your_Feedback,
+                Lessons_Download_Your_Certificate: lesson.Lessons_Download_Your_Certificate,
+                Enrolment_Student_ID: lesson.Enrolment_Student_ID,
+
+                // Module-level information
+                Module_Name: modulesMap[moduleId].Module_Name,
+                EnrolmentID: modulesMap[moduleId].EnrolmentID,
+                Don_t_Track_Progress: modulesMap[moduleId].Don_t_Track_Progress,
+                Course_Course_Access_Type: modulesMap[moduleId].Course_Course_Access_Type,
+                Module_Description: modulesMap[moduleId].Description,
+                Open_Date_Text: modulesMap[moduleId].Open_Date_Text,
+                isAvailable: modulesMap[moduleId].isAvailable,
+                Week_Open_from_Start_Date: modulesMap[moduleId].Week_Open_from_Start_Date,
+            });
+
+            console.log(`✅ Added Lesson '${lesson.Lessons_Lesson_Name}' to Module '${modulesMap[moduleId].Module_Name}'`);
         }
     }
 
@@ -485,9 +495,9 @@ async function combineModulesAndLessons() {
     let sortedModules = Object.values(modulesMap);
     sortedModules.sort((a, b) => a.Order - b.Order);
 
+    console.log("📌 Final Sorted Modules:", sortedModules);
     return sortedModules;
 }
-
 
 // Function to render modules using JsRender
 async function renderModules() {
