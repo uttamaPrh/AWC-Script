@@ -80,7 +80,7 @@ function determineAvailability(startDateUnix, weeks, customisation) {
     }
 
     const todayUnix = Math.floor(Date.now() / 1000);
-    const isAvailable = openDateUnix <= todayUnix;
+    const isAvailable = openDateUnix >= todayUnix;
 
     console.log(`Final Availability Calculation: Open Date - ${openDateText}, Available - ${isAvailable}`);
 
