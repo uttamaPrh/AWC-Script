@@ -381,7 +381,7 @@ async function combineModulesAndLessons() {
 
             }
         }
-    });
+    };
 
     let sortedModules = Object.values(modulesMap);
     sortedModules.sort((a, b) => a.Order - b.Order);
