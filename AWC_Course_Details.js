@@ -119,36 +119,54 @@ async function fetchModuleCustomisation(moduleID) {
 
 // Function to determine module availability
 function determineAvailability(startDateUnix, weeks, customisation) {
-    if (!startDateUnix) return { isAvailable: false, openDateText: "No Start Date" };
+    if (!startDateUnix) {
+        console.warn("⚠️ No Start Date Provided!");
+        return { isAvailable: false, openDateText: "No Start Date" };
+    }
+
+    console.log(`📌 Processing Availability Calculation...`);
+    console.log(`🔹 Start Date Unix: ${startDateUnix}`);
+    console.log(`🔹 Weeks from Start Date: ${weeks}`);
 
     let openDateUnix;
     let openDateText;
 
-    // If no customisation data, use default logic
     if (!customisation) {
+        // Default logic when no customization exists
         openDateUnix = startDateUnix + (weeks * 7 * 24 * 60 * 60);
         openDateText = `Unlocks on ${formatDate(openDateUnix)}`;
+        console.log("✅ No Customization Found. Using Default Open Date:", openDateText);
     } else {
+        console.log("🛠 Customization Data Found:", customisation);
+
         if (customisation.Specific_Date) {
-            // Use the specific date from customization
+            // Use the specific date as the open date
             openDateUnix = Math.floor(new Date(customisation.Specific_Date).getTime() / 1000);
             openDateText = `Unlocks on ${formatDate(openDateUnix)}`;
+            console.log("📅 Using Specific Date from Customization:", openDateText);
         } else if (customisation.Days_to_Offset !== null) {
-            // Apply the offset logic
+            // Apply offset logic
+            console.log("🔄 Applying Offset Logic...");
+            console.log("🔹 Offset Days:", customisation.Days_to_Offset);
+
             openDateUnix = startDateUnix + (customisation.Days_to_Offset * 24 * 60 * 60);
             openDateText = `Unlocks on ${formatDate(openDateUnix)}`;
+            console.log("📅 Open Date After Offset:", openDateText);
         } else {
-            return { isAvailable: false, openDateText: "No Customisation Applied" };
+            console.warn("⚠️ Customization exists but has NO Specific Date or Offset. Using Default Logic.");
+            openDateUnix = startDateUnix + (weeks * 7 * 24 * 60 * 60);
+            openDateText = `Unlocks on ${formatDate(openDateUnix)}`;
         }
     }
 
     const todayUnix = Math.floor(Date.now() / 1000);
-    const isAvailable = openDateUnix >= todayUnix;
+    const isAvailable = openDateUnix <= todayUnix;
 
-    console.log(`Final Availability Calculation: Open Date - ${openDateText}, Available - ${isAvailable}`);
+    console.log(`✅ Final Calculation: Open Date - ${openDateText}, Available - ${isAvailable}`);
 
     return { isAvailable, openDateText };
 }
+
 
 // Function to fetch lesson statuses
 async function fetchLessonStatuses() {
