@@ -444,13 +444,8 @@ async function combineModulesAndLessons() {
 
             // Placeholder for due date (if assessment)
             let dueDateInfo = { dueDateUnix: null, dueDateText: "No Due Date" };
-
             if (lesson.Type === "Assessment") {
-                assessmentPromises.push(
-                    determineAssessmentDueDate(lesson, modulesMap[moduleId].Class_Start_Date).then(dueDate => {
-                        dueDateInfo = dueDate;
-                    })
-                );
+                dueDateInfo = await determineAssessmentDueDate(lesson, modulesMap[moduleId].Class_Start_Date);
             }
 
             // Push lesson into the module
