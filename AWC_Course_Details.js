@@ -63,7 +63,6 @@
 
 const API_KEY = "mMzQezxyIwbtSc85rFPs3";
 const GRAPHQL_ENDPOINT = "https://awc.vitalstats.app/api/v1/graphql";
-const studentID = 50;
 
 // Function to fetch GraphQL Data
 async function fetchGraphQL(query) {
