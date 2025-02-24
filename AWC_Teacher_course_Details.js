@@ -198,7 +198,7 @@ async function fetchLessonStatuses() {
 async function combineModulesAndLessons() {
     const modulesResponse = await fetchGraphQL(getModulesQuery);
     const lessonsResponse = await fetchGraphQL(getLessonsQuery);
-    const lessonStatuses = await fetchLessonStatuses(studentID);
+   // const lessonStatuses = await fetchLessonStatuses(studentID);
 
     const modules = modulesResponse?.calcModules || [];
     const lessonsData = lessonsResponse?.calcLessons || []; 
