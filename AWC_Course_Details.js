@@ -163,7 +163,7 @@ function getUpcomingSunday(startDateUnix, weeksOffset = 0) {
 
 // Function to determine due date for Assessments only
 async function determineAssessmentDueDate(lesson, moduleStartDateUnix) {
-    const lessonID = lesson.LessonsID;
+    const lessonID = lesson.ID;
     const dueWeek = lesson.Assessment_Due_End_of_Week;
     const customisation = await fetchLessonCustomisation(lessonID);
 
