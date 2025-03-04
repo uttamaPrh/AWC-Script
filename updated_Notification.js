@@ -212,13 +212,7 @@ function processNotification(notification) {
     
     // ✅ Prepend to the primary container
     container1.prepend(card);
-    while (container1.children.length > 10) {
-        const lastChild = container1.lastChild;
-        if (lastChild) {
-            displayedNotifications.delete(Number(lastChild.getAttribute("data-id"))); // Remove from tracking
-            container1.removeChild(lastChild);
-        }
-    }
+    
     let cardClone = null;
 
     // ✅ Prepend to the secondary container only if it exists
