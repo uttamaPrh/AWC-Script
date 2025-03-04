@@ -200,34 +200,75 @@ return card;
 //     updateNoNotificationMessagesSec();
 // }
 // ✅ Process and prepend notification
+// function processNotification(notification) {
+//     const container1 = document.getElementById("parentNotificationTemplatesInBody");
+//     const container2 = document.getElementById("secondaryNotificationContainer"); 
+
+//     const id = Number(notification.ID);
+//     if (displayedNotifications.has(id)) return;
+//     displayedNotifications.add(id);
+    
+//     const isRead = readAnnouncements.has(id);
+//     const card = createNotificationCard(notification, isRead);
+    
+//     // ✅ Prepend to the primary container
+//     container1.prepend(card);
+
+//     let cardClone = null;
+
+//     // ✅ Prepend to the secondary container only if it exists
+//     if (container2) {
+//         cardClone = createNotificationCard(notification, isRead);
+//         container2.prepend(cardClone);
+//     }
+
+//     // ✅ Store both the original and cloned cards in cardMap (if cloned)
+//     cardMap.set(id, { original: card, clone: cardClone });
+
+//     // ✅ Update UI
+//     updateNoNotificationMessages(); 
+//     updateNoNotificationMessagesSec();
+// }
+// ✅ Process and prepend notification while maintaining latest to oldest order
 function processNotification(notification) {
     const container1 = document.getElementById("parentNotificationTemplatesInBody");
     const container2 = document.getElementById("secondaryNotificationContainer"); 
 
     const id = Number(notification.ID);
-    if (displayedNotifications.has(id)) return;
+    if (displayedNotifications.has(id)) return; // Prevent duplicates
     displayedNotifications.add(id);
     
     const isRead = readAnnouncements.has(id);
-    const card = createNotificationCard(notification, isRead);
-    
-    // ✅ Prepend to the primary container
-    container1.prepend(card);
 
-    let cardClone = null;
+    // ✅ Add new notification to the array
+    notificationData.push(notification);
 
-    // ✅ Prepend to the secondary container only if it exists
-    if (container2) {
-        cardClone = createNotificationCard(notification, isRead);
-        container2.prepend(cardClone);
-    }
+    // ✅ Sort notifications by Date_Added (newest first)
+    notificationData.sort((a, b) => new Date(b.Date_Added) - new Date(a.Date_Added));
 
-    // ✅ Store both the original and cloned cards in cardMap (if cloned)
-    cardMap.set(id, { original: card, clone: cardClone });
+    // ✅ Clear the containers before re-rendering
+    container1.innerHTML = "";
+    if (container2) container2.innerHTML = "";
 
-    // ✅ Update UI
+    // ✅ Re-add notifications in sorted order (latest → oldest)
+    notificationData.forEach((notif) => {
+        const sortedCard = createNotificationCard(notif, readAnnouncements.has(Number(notif.ID)));
+        container1.appendChild(sortedCard);
+
+        let sortedCardClone = null;
+        if (container2) {
+            sortedCardClone = createNotificationCard(notif, readAnnouncements.has(Number(notif.ID)));
+            container2.appendChild(sortedCardClone);
+        }
+        
+        // ✅ Store both cards in cardMap
+        cardMap.set(Number(notif.ID), { original: sortedCard, clone: sortedCardClone });
+    });
+
+    // ✅ Update UI elements
     updateNoNotificationMessages(); 
     updateNoNotificationMessagesSec();
+    updateMarkAllReadVisibility();
 }
 
 
