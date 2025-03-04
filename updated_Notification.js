@@ -172,33 +172,6 @@ return card;
 
 
 
-function processNotification(notification) {
-    const container1 = document.getElementById("parentNotificationTemplatesInBody");
-    const container2 = document.getElementById("secondaryNotificationContainer"); 
-
-    const id = Number(notification.ID);
-    if (displayedNotifications.has(id)) return;
-    displayedNotifications.add(id);
-    
-    const isRead = readAnnouncements.has(id);
-    const card = createNotificationCard(notification, isRead);
-    
-    // Append to the primary container
-    container1.prepend(card);
-    let cardClone = null;
-
-    // Append to the secondary container only if it exists
-    if (container2) {
-        cardClone = createNotificationCard(notification, isRead);
-        container2.prepend(cardClone);
-    }
-
-    // Store both the original and cloned cards in cardMap (if cloned)
-    cardMap.set(id, { original: card, clone: cardClone });
-    updateNoNotificationMessages(); 
-    updateNoNotificationMessagesSec();
-}
-// ✅ Process and prepend notification
 // function processNotification(notification) {
 //     const container1 = document.getElementById("parentNotificationTemplatesInBody");
 //     const container2 = document.getElementById("secondaryNotificationContainer"); 
@@ -210,24 +183,51 @@ function processNotification(notification) {
 //     const isRead = readAnnouncements.has(id);
 //     const card = createNotificationCard(notification, isRead);
     
-//     // ✅ Prepend to the primary container
+//     // Append to the primary container
 //     container1.prepend(card);
-
 //     let cardClone = null;
 
-//     // ✅ Prepend to the secondary container only if it exists
+//     // Append to the secondary container only if it exists
 //     if (container2) {
 //         cardClone = createNotificationCard(notification, isRead);
 //         container2.prepend(cardClone);
 //     }
 
-//     // ✅ Store both the original and cloned cards in cardMap (if cloned)
+//     // Store both the original and cloned cards in cardMap (if cloned)
 //     cardMap.set(id, { original: card, clone: cardClone });
-
-//     // ✅ Update UI
 //     updateNoNotificationMessages(); 
 //     updateNoNotificationMessagesSec();
 // }
+// ✅ Process and prepend notification
+function processNotification(notification) {
+    const container1 = document.getElementById("parentNotificationTemplatesInBody");
+    const container2 = document.getElementById("secondaryNotificationContainer"); 
+
+    const id = Number(notification.ID);
+    if (displayedNotifications.has(id)) return;
+    displayedNotifications.add(id);
+    
+    const isRead = readAnnouncements.has(id);
+    const card = createNotificationCard(notification, isRead);
+    
+    // ✅ Prepend to the primary container
+    container1.prepend(card);
+
+    let cardClone = null;
+
+    // ✅ Prepend to the secondary container only if it exists
+    if (container2) {
+        cardClone = createNotificationCard(notification, isRead);
+        container2.prepend(cardClone);
+    }
+
+    // ✅ Store both the original and cloned cards in cardMap (if cloned)
+    cardMap.set(id, { original: card, clone: cardClone });
+
+    // ✅ Update UI
+    updateNoNotificationMessages(); 
+    updateNoNotificationMessagesSec();
+}
 
 
 
