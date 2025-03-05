@@ -203,8 +203,7 @@ async function initializeSocket() {
     };
 }
 
-classIds.forEach(connect);
-}
+initializeSocket();
 
 // ✅ Create notification card
 function createNotificationCard(notification, isRead) {
