@@ -133,14 +133,11 @@ async function initializeSocket() {
     const filteredNotifications = notifications.filter(notification => {
         const postAuthor = notification.Post_Author_ID;
         const commentAuthor = notification.Comment_Author_ID;
+        const instID = notification.Instructor_ID;
         const userId = Number(CONTACTss_ID);
-        
-   
-        if (postAuthor === userId || commentAuthor === userId){
-         
+        if (postAuthor === userId || commentAuthor === userId ||  instID  === userId ){
           return false;
         }else{
-         
         return true;}
     });
 
