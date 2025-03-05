@@ -52,14 +52,14 @@ try {
   });
 
   const result = await response.json();
-  console.log('Class IDs:', result);
+
   
   if (result.data && result.data.calcEnrolments) {
       return result.data.calcEnrolments.map(enrolment => enrolment.Class_ID);
   }
   return [];
 } catch (error) {
-  console.error("Error fetching class IDs:", error);
+ 
   return [];
 }
 }
@@ -74,14 +74,14 @@ async function initializeSocket() {
         return;
     }
 
-    console.log("Initializing WebSockets for class IDs:", classIds);
+    
 
     classIds.forEach((classId) => {
         const socket = new WebSocket(WS_ENDPOINT, "vitalstats"); // ✅ Open a new WebSocket per class ID
         let keepAliveInterval;
 
         socket.onopen = () => {
-            console.log(`✅ WebSocket connection opened for Class ID: ${classId}`);
+           
 
             keepAliveInterval = setInterval(() => {
                 if (socket.readyState === WebSocket.OPEN) {
@@ -111,21 +111,21 @@ async function initializeSocket() {
         // ✅ Make sure fetch is called for each class ID
        socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log(`🔄 WebSocket Message for Class ID ${classId}:`, data); // Debugging
+
 
     if (data.type !== "GQL_DATA") return;
     if (!data.payload || !data.payload.data) {
-        console.warn(`⚠️ No announcements received for Class ID ${classId}`);
+      
         return;
     }
 
     const result = data.payload.data.subscribeToCalcAnnouncements;
     if (!result) {
-        console.warn(`⚠️ No valid notifications for Class ID ${classId}`);
+       
         return;
     }
 
-    console.log(`📢 Received notifications for Class ID ${classId}:`, result);
+    
     const notifications = Array.isArray(result) ? result : [result];
 
     // ✅ Show notification if both `Post_Author_ID` & `Comment_Author_ID` are `null`
@@ -134,13 +134,13 @@ async function initializeSocket() {
         const postAuthor = notification.Post_Author_ID;
         const commentAuthor = notification.Comment_Author_ID;
         const userId = Number(CONTACTss_ID);
-          console.log(` postAuthor = notification.Post_Author_ID;:`, postAuthor);
-      console.log(`commentAuthor = notification.Comment_Author_ID;:`, commentAuthor);
+        
+   
         if (postAuthor === userId || commentAuthor === userId){
-          console.log(`(postAuthor === userId || commentAuthor === userId)`, CONTACTss_ID);
+         
           return false;
         }else{
-           console.log(`(postAuthor === CONTACTss_ID || commentAuthor === CONTACTss_ID)`, CONTACTss_ID);
+         
         return true;}
     });
 
@@ -318,7 +318,7 @@ async function markAsRead(announcementId) {
         }
     } catch (error) {
         pendingAnnouncements.delete(announcementId);
-        console.error("❌ Error marking notification as read:", error);
+       
     }
 }
 
@@ -327,7 +327,7 @@ async function markAsRead(announcementId) {
 
 // ✅ Mark all unread notifications as read
 function markAllAsRead() {
-    console.log("✅ Marking all unread notifications as read...");
+   
 
     let hasUnread = false;
 
@@ -338,7 +338,6 @@ function markAllAsRead() {
         }
     });
 
-    console.log("✅ All unread notifications marked as read.");
 
     // ✅ Hide "Mark All Read" elements if no unread notifications exist
     updateMarkAllReadVisibility();
@@ -352,40 +351,12 @@ document.addEventListener("DOMContentLoaded", () => {
 const markAllBtn = document.getElementById("markEveryAsRead");
 if (markAllBtn) {
     markAllBtn.addEventListener("click", markAllAsRead);
-    console.log("Mark All Read button initialized.");
+   
 } else {
-    console.warn("Button with ID 'markEveryAsRead' not found.");
+    
 }
 });
-// function fetchReadData() {
-// fetch(HTTP_ENDPOINT, {
-// method: "POST",
-// headers: {
-//     "Content-Type": "application/json",
-//     "Api-Key": APIii_KEY,
-// },
-// body: JSON.stringify({ query: READ_QUERY }),
-// })
-// .then((response) => response.json())
-// .then((data) => {
-// if (data.data && data.data.calcOReadContactReadAnnouncements) {
-//     const records = Array.isArray(data.data.calcOReadContactReadAnnouncements)
-//         ? data.data.calcOReadContactReadAnnouncements
-//         : [data.data.calcOReadContactReadAnnouncements];
-//     records.forEach((record) => {
-//         if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
-//             readAnnouncements.add(Number(record.Read_Announcement_ID));
-//         }
-//     });
-//             updateNotificationReadStatus();
-//             updateNoNotificationMessages(); 
-//             updateNoNotificationMessagesSec();
-// }
-// })
-// .catch((error) => {
-// console.error("Error fetching read data:", error);
-// });
-// }
+
 // ✅ Ensure fetching read data per class
 function fetchReadDataForClass(classId) {
     console.log(`🔍 Fetching read data for Class ID: ${classId}`);
@@ -461,11 +432,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let showUnreadMode = false;
     let showUnreadAllMode = false;
 
-    //function updateNoNotificationMessages() {
-     //   const visibleCards = [...cardMap.values()].filter(({ original }) => original && !original.classList.contains("hidden"));
-     //   noAllMessage.classList.toggle("hidden", visibleCards.length > 0);
-     //   noAnnouncementsMessage.classList.toggle("hidden", visibleCards.length > 0);
-    //}
+   
 
    function toggleVisibilityAll() {
     let hasData = false;
