@@ -205,20 +205,18 @@ try {
 
 // initializeSocket();
 
-
 async function initializeSocket() {
-    const classIds = await fetchClassIds(); // Fetch class IDs
+    const classIds = await fetchClassIds(); // Fetch all class IDs
 
     if (!classIds || classIds.length === 0) {
         console.error("No class IDs found. Cannot initialize WebSocket.");
         return;
     }
 
-    console.log("Initializing WebSocket for class IDs:", classIds);
+    console.log("Initializing WebSockets for class IDs:", classIds);
 
-    classIds.forEach((classId, index) => {
-        const socket = new WebSocket(WS_ENDPOINT, "vitalstats");
-
+    classIds.forEach((classId) => {
+        const socket = new WebSocket(WS_ENDPOINT, "vitalstats"); // ✅ Open a new WebSocket per class ID
         let keepAliveInterval;
 
         socket.onopen = () => {
@@ -232,17 +230,17 @@ async function initializeSocket() {
 
             socket.send(JSON.stringify({ type: "connection_init" }));
 
-            // ✅ Subscribe separately for each class ID
+            // ✅ Subscribe only to this specific class ID
             socket.send(
                 JSON.stringify({
-                    id: `subscription_${classId}_${index}`,
+                    id: `subscription_${classId}`, // Unique subscription ID
                     type: "GQL_START",
                     payload: {
                         query: SUBSCRIPTION_QUERY,
                         variables: {
                             author_id: LOGGED_IN_CONTACT_ID,
                             id: LOGGED_IN_CONTACT_ID,
-                            class_id: classId, 
+                            class_id: classId,
                         },
                     },
                 })
@@ -285,6 +283,7 @@ async function initializeSocket() {
 
 // ✅ Call once
 initializeSocket();
+
 
 
 // ✅ Create notification card
