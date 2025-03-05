@@ -269,8 +269,8 @@ async function initializeSocket() {
 
     // ✅ Filter out notifications where the user is the author
     const filteredNotifications = notifications.filter(notification => 
-        notification.Comment_Author_ID !== CONTACTss_ID && 
-        notification.Post_Author_ID !== CONTACTss_ID
+        notification.Comment_Author_ID !== ${CONTACTss_ID} && 
+        notification.Post_Author_ID !== ${CONTACTss_ID}
     );
 
     if (filteredNotifications.length === 0) {
