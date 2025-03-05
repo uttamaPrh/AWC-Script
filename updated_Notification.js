@@ -266,11 +266,11 @@ async function initializeSocket() {
 
     console.log(`📢 Received notifications for Class ID ${classId}:`, result);
     const notifications = Array.isArray(result) ? result : [result];
-
+    console.log(`Contact is = ${CONTACTss_ID}`);
     // ✅ Filter out notifications where the user is the author
     const filteredNotifications = notifications.filter(notification => 
-        notification.Comment_Author_ID !== ${CONTACTss_ID} && 
-        notification.Post_Author_ID !== ${CONTACTss_ID}
+        notification.Comment_Author_ID !== CONTACTss_ID && 
+        notification.Post_Author_ID !== CONTACTss_ID
     );
 
     if (filteredNotifications.length === 0) {
@@ -342,35 +342,6 @@ card.addEventListener("click", async function () {
 return card;
 }
 
-
-
-
-// function processNotification(notification) {
-//     const container1 = document.getElementById("parentNotificationTemplatesInBody");
-//     const container2 = document.getElementById("secondaryNotificationContainer"); 
-
-//     const id = Number(notification.ID);
-//     if (displayedNotifications.has(id)) return;
-//     displayedNotifications.add(id);
-    
-//     const isRead = readAnnouncements.has(id);
-//     const card = createNotificationCard(notification, isRead);
-    
-//     // Append to the primary container
-//     container1.prepend(card);
-//     let cardClone = null;
-
-//     // Append to the secondary container only if it exists
-//     if (container2) {
-//         cardClone = createNotificationCard(notification, isRead);
-//         container2.prepend(cardClone);
-//     }
-
-//     // Store both the original and cloned cards in cardMap (if cloned)
-//     cardMap.set(id, { original: card, clone: cardClone });
-//     updateNoNotificationMessages(); 
-//     updateNoNotificationMessagesSec();
-// }
 // ✅ Process and prepend notification
 function processNotification(notification) {
     const container1 = document.getElementById("parentNotificationTemplatesInBody");
