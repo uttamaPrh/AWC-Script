@@ -111,7 +111,7 @@ async function initializeSocket() {
         // ✅ Make sure fetch is called for each class ID
        socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log(`🔄 WebSocket Message for Class ID ${classId}:`, data);
+    console.log(`🔄 WebSocket Message for Class ID ${classId}:`, data); // Debugging
 
     if (data.type !== "GQL_DATA") return;
     if (!data.payload || !data.payload.data) {
@@ -127,18 +127,24 @@ async function initializeSocket() {
 
     console.log(`📢 Received notifications for Class ID ${classId}:`, result);
     const notifications = Array.isArray(result) ? result : [result];
-    console.log(`Contact is = ${CONTACTss_ID}`);
-    // ✅ Filter out notifications where the user is the author
-    const filteredNotifications = notifications.filter(notification => 
-        notification.Comment_Author_ID !== CONTACTss_ID || 
-        notification.Post_Author_ID !== CONTACTss_ID
-    );
+
+    // ✅ Show notification if both `Post_Author_ID` & `Comment_Author_ID` are `null`
+    // ✅ Hide if either matches `CONTACTss_ID`
+    const filteredNotifications = notifications.filter(notification => {
+        const postAuthor = notification.Post_Author_ID;
+        const commentAuthor = notification.Comment_Author_ID;
+        if (postAuthor === null && commentAuthor === null) return true;
+        if (postAuthor === CONTACTss_ID || commentAuthor === CONTACTss_ID) return false;
+
+        return true;
+    });
 
     if (filteredNotifications.length === 0) {
         console.warn(`⚠️ All notifications for Class ID ${classId} were filtered out.`);
         return;
     }
 
+    // ✅ Process only relevant notifications
     filteredNotifications.forEach(notification => {
         processNotification(notification);
         notificationIDs.add(Number(notification.ID));
@@ -147,6 +153,7 @@ async function initializeSocket() {
 
     updateMarkAllReadVisibility();
 };
+
 
 
         // ✅ Fetch read data separately for each class
