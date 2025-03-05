@@ -131,79 +131,161 @@ try {
 //         console.error("WebSocket error:", error);
 //     };
 // }
-async function initializeSocket() {
-    const classIds = await fetchClassIds(); // Fetch all class IDs
+// async function initializeSocket() {
+//     const classIds = await fetchClassIds(); // Fetch all class IDs
 
-    if (classIds.length === 0) {
+//     if (classIds.length === 0) {
+//         console.error("No class IDs found. Cannot initialize WebSocket.");
+//         return;
+//     }
+
+//     const socket = new WebSocket(WS_ENDPOINT, "vitalstats");
+//     let keepAliveInterval;
+
+//     socket.onopen = () => {
+//         console.log("WebSocket connection opened.");
+//         keepAliveInterval = setInterval(() => {
+//             if (socket.readyState === WebSocket.OPEN) {
+//                 socket.send(JSON.stringify({ type: "KEEP_ALIVE" }));
+//             }
+//         }, 28000);
+
+//         socket.send(JSON.stringify({ type: "connection_init" }));
+
+//         // Subscribe to announcements for ALL class IDs
+//         classIds.forEach((classId, index) => {
+//             socket.send(
+//                 JSON.stringify({
+//                     id: `subscription_${index}`, // Unique ID for each subscription
+//                     type: "GQL_START",
+//                     payload: {
+//                         query: SUBSCRIPTION_QUERY,
+//                         variables: {
+//                             author_id: LOGGED_IN_CONTACT_ID,
+//                             id: LOGGED_IN_CONTACT_ID,
+//                             class_id: classId,
+//                         },
+//                     },
+//                 })
+//             );
+//         });
+
+//         fetchReadData();
+//     };
+
+//     socket.onmessage = (event) => {
+//         const data = JSON.parse(event.data);
+//         if (data.type !== "GQL_DATA") return;
+//         if (!data.payload || !data.payload.data) return;
+
+//         const result = data.payload.data.subscribeToCalcAnnouncements;
+//         if (!result) return;
+
+//         console.log('Received notifications:', result);
+//         const notifications = Array.isArray(result) ? result : [result];
+//         notifications.forEach(notification => {
+//             processNotification(notification);
+//             notificationIDs.add(Number(notification.ID));
+//             notificationData.push(notification);
+//         });
+
+//         updateMarkAllReadVisibility();
+//     };
+
+//     socket.onclose = () => {
+//         console.warn("WebSocket closed. Retrying...");
+//         clearInterval(keepAliveInterval);
+//         setTimeout(initializeSocket, 2000); // Reconnect on close
+//     };
+
+//     socket.onerror = (error) => {
+//         console.error("WebSocket error:", error);
+//     };
+// }
+
+// initializeSocket();
+
+
+async function initializeSocket() {
+    const classIds = await fetchClassIds(); // Fetch class IDs
+
+    if (!classIds || classIds.length === 0) {
         console.error("No class IDs found. Cannot initialize WebSocket.");
         return;
     }
 
-    const socket = new WebSocket(WS_ENDPOINT, "vitalstats");
-    let keepAliveInterval;
+    console.log("Initializing WebSocket for class IDs:", classIds);
 
-    socket.onopen = () => {
-        console.log("WebSocket connection opened.");
-        keepAliveInterval = setInterval(() => {
-            if (socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify({ type: "KEEP_ALIVE" }));
-            }
-        }, 28000);
+    classIds.forEach((classId, index) => {
+        const socket = new WebSocket(WS_ENDPOINT, "vitalstats");
 
-        socket.send(JSON.stringify({ type: "connection_init" }));
+        let keepAliveInterval;
 
-        // Subscribe to announcements for ALL class IDs
-        classIds.forEach((classId, index) => {
+        socket.onopen = () => {
+            console.log(`✅ WebSocket connection opened for Class ID: ${classId}`);
+
+            keepAliveInterval = setInterval(() => {
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ type: "KEEP_ALIVE" }));
+                }
+            }, 28000);
+
+            socket.send(JSON.stringify({ type: "connection_init" }));
+
+            // ✅ Subscribe separately for each class ID
             socket.send(
                 JSON.stringify({
-                    id: `subscription_${index}`, // Unique ID for each subscription
+                    id: `subscription_${classId}_${index}`,
                     type: "GQL_START",
                     payload: {
                         query: SUBSCRIPTION_QUERY,
                         variables: {
                             author_id: LOGGED_IN_CONTACT_ID,
                             id: LOGGED_IN_CONTACT_ID,
-                            class_id: classId,
+                            class_id: classId, 
                         },
                     },
                 })
             );
-        });
 
-        fetchReadData();
-    };
+            fetchReadData(); // Fetch read announcements data
+        };
 
-    socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type !== "GQL_DATA") return;
-        if (!data.payload || !data.payload.data) return;
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type !== "GQL_DATA") return;
+            if (!data.payload || !data.payload.data) return;
 
-        const result = data.payload.data.subscribeToCalcAnnouncements;
-        if (!result) return;
+            const result = data.payload.data.subscribeToCalcAnnouncements;
+            if (!result) return;
 
-        console.log('Received notifications:', result);
-        const notifications = Array.isArray(result) ? result : [result];
-        notifications.forEach(notification => {
-            processNotification(notification);
-            notificationIDs.add(Number(notification.ID));
-            notificationData.push(notification);
-        });
+            console.log(`📢 Received notifications for Class ID ${classId}:`, result);
 
-        updateMarkAllReadVisibility();
-    };
+            const notifications = Array.isArray(result) ? result : [result];
+            notifications.forEach(notification => {
+                processNotification(notification);
+                notificationIDs.add(Number(notification.ID));
+                notificationData.push(notification);
+            });
 
-    socket.onclose = () => {
-        console.warn("WebSocket closed. Retrying...");
-        clearInterval(keepAliveInterval);
-        setTimeout(initializeSocket, 2000); // Reconnect on close
-    };
+            updateMarkAllReadVisibility();
+        };
 
-    socket.onerror = (error) => {
-        console.error("WebSocket error:", error);
-    };
+        socket.onclose = () => {
+            console.warn(`⚠️ WebSocket closed for Class ID ${classId}. Retrying...`);
+            clearInterval(keepAliveInterval);
+            setTimeout(() => initializeSocket(), 2000);
+        };
+
+        socket.onerror = (error) => {
+            console.error(`❌ WebSocket error for Class ID ${classId}:`, error);
+        };
+    });
 }
 
+// ✅ Call once
 initializeSocket();
+
 
 // ✅ Create notification card
 function createNotificationCard(notification, isRead) {
