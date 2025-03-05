@@ -230,10 +230,10 @@ async function initializeSocket() {
 
             socket.send(JSON.stringify({ type: "connection_init" }));
 
-            // ✅ Subscribe only to this specific class ID
+            // ✅ Subscribe for EACH class ID
             socket.send(
                 JSON.stringify({
-                    id: `subscription_${classId}`, // Unique subscription ID
+                    id: `subscription_${classId}`,
                     type: "GQL_START",
                     payload: {
                         query: SUBSCRIPTION_QUERY,
@@ -245,21 +245,29 @@ async function initializeSocket() {
                     },
                 })
             );
-
-            fetchReadData(); // Fetch read announcements data
         };
 
+        // ✅ Make sure fetch is called for each class ID
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log(`🔄 WebSocket Message for Class ID ${classId}:`, data); // Log ALL data
+
             if (data.type !== "GQL_DATA") return;
-            if (!data.payload || !data.payload.data) return;
+            if (!data.payload || !data.payload.data) {
+                console.warn(`⚠️ No announcements received for Class ID ${classId}`);
+                return;
+            }
 
             const result = data.payload.data.subscribeToCalcAnnouncements;
-            if (!result) return;
+            if (!result) {
+                console.warn(`⚠️ No valid notifications for Class ID ${classId}`);
+                return;
+            }
 
             console.log(`📢 Received notifications for Class ID ${classId}:`, result);
-
             const notifications = Array.isArray(result) ? result : [result];
+
+            // ✅ Process EACH notification separately
             notifications.forEach(notification => {
                 processNotification(notification);
                 notificationIDs.add(Number(notification.ID));
@@ -268,6 +276,9 @@ async function initializeSocket() {
 
             updateMarkAllReadVisibility();
         };
+
+        // ✅ Fetch read data separately for each class
+        fetchReadDataForClass(classId);
 
         socket.onclose = () => {
             console.warn(`⚠️ WebSocket closed for Class ID ${classId}. Retrying...`);
@@ -491,36 +502,72 @@ if (markAllBtn) {
     console.warn("Button with ID 'markEveryAsRead' not found.");
 }
 });
-function fetchReadData() {
-fetch(HTTP_ENDPOINT, {
-method: "POST",
-headers: {
-    "Content-Type": "application/json",
-    "Api-Key": APIii_KEY,
-},
-body: JSON.stringify({ query: READ_QUERY }),
-})
-.then((response) => response.json())
-.then((data) => {
-if (data.data && data.data.calcOReadContactReadAnnouncements) {
-    const records = Array.isArray(data.data.calcOReadContactReadAnnouncements)
-        ? data.data.calcOReadContactReadAnnouncements
-        : [data.data.calcOReadContactReadAnnouncements];
-    records.forEach((record) => {
-        if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
-            readAnnouncements.add(Number(record.Read_Announcement_ID));
-        }
-    });
+// function fetchReadData() {
+// fetch(HTTP_ENDPOINT, {
+// method: "POST",
+// headers: {
+//     "Content-Type": "application/json",
+//     "Api-Key": APIii_KEY,
+// },
+// body: JSON.stringify({ query: READ_QUERY }),
+// })
+// .then((response) => response.json())
+// .then((data) => {
+// if (data.data && data.data.calcOReadContactReadAnnouncements) {
+//     const records = Array.isArray(data.data.calcOReadContactReadAnnouncements)
+//         ? data.data.calcOReadContactReadAnnouncements
+//         : [data.data.calcOReadContactReadAnnouncements];
+//     records.forEach((record) => {
+//         if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
+//             readAnnouncements.add(Number(record.Read_Announcement_ID));
+//         }
+//     });
+//             updateNotificationReadStatus();
+//             updateNoNotificationMessages(); 
+//             updateNoNotificationMessagesSec();
+// }
+// })
+// .catch((error) => {
+// console.error("Error fetching read data:", error);
+// });
+// }
+// ✅ Ensure fetching read data per class
+function fetchReadDataForClass(classId) {
+    console.log(`🔍 Fetching read data for Class ID: ${classId}`);
+    
+    fetch(HTTP_ENDPOINT, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Api-Key": APIii_KEY,
+        },
+        body: JSON.stringify({
+            query: READ_QUERY,
+            variables: { class_id: classId }
+        }),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        if (data.data && data.data.calcOReadContactReadAnnouncements) {
+            const records = Array.isArray(data.data.calcOReadContactReadAnnouncements)
+                ? data.data.calcOReadContactReadAnnouncements
+                : [data.data.calcOReadContactReadAnnouncements];
+
+            records.forEach((record) => {
+                if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
+                    readAnnouncements.add(Number(record.Read_Announcement_ID));
+                }
+            });
+
             updateNotificationReadStatus();
             updateNoNotificationMessages(); 
             updateNoNotificationMessagesSec();
+        }
+    })
+    .catch((error) => {
+        console.error(`❌ Error fetching read data for Class ID ${classId}:`, error);
+    });
 }
-})
-.catch((error) => {
-console.error("Error fetching read data:", error);
-});
-}
-
 
 function updateNoNotificationMessages() {
     const noAllMessage = document.getElementById("noAllMessage");
