@@ -369,7 +369,8 @@ async function combineModulesAndLessons() {
                 Enrolment_Student_ID: lesson.Enrolment_Student_ID, // ✅ From new query
 
                 // Module-level Information
-                Module_Name: modulesMap[moduleId].Module_Name, // ✅ From module
+                Module_Name: modulesMap[moduleId].Module_Name,
+                Enrolment_Certificate_Link: modulesMap[moduleId].Enrolment_Certificate_Link,// ✅ From module
                 EnrolmentID: modulesMap[moduleId].EnrolmentID, // ✅ From module
                 Don_t_Track_Progress: modulesMap[moduleId].Don_t_Track_Progress, // ✅ From module
                 Course_Course_Access_Type: modulesMap[moduleId].Course_Course_Access_Type, // ✅ From module
