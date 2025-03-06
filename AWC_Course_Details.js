@@ -370,6 +370,7 @@ async function combineModulesAndLessons() {
 
                 // Module-level Information
                 Module_Name: modulesMap[moduleId].Module_Name,
+                Enrolment_Completion_Date: modulesMap[moduleId].Enrolment_Completion_Date,
                 Enrolment_Certificate_Link: modulesMap[moduleId].Enrolment_Certificate_Link,// ✅ From module
                 EnrolmentID: modulesMap[moduleId].EnrolmentID, // ✅ From module
                 Don_t_Track_Progress: modulesMap[moduleId].Don_t_Track_Progress, // ✅ From module
