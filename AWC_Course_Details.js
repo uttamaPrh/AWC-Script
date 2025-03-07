@@ -79,7 +79,7 @@ async function fetchGraphQL(query) {
         const result = await response.json();
         return result?.data || {};
     } catch (error) {
-        console.error("Error fetching data:", error);
+       
         return {};
     }
 }
@@ -111,14 +111,12 @@ async function fetchModuleCustomisation(moduleID) {
     const response = await fetchGraphQL(customisationQuery);
     const customisation = response?.calcClassCustomisations?.[0] || null;
     
-    console.log(`Customisation Data for Module ${moduleID}:`, customisation ? "Available" : "Not Available", customisation);
+   
     
     return customisation;
 }
-//function to fetch lesson assessment due date
-// Function to fetch lesson customization for Assessments
 async function fetchLessonCustomisation(lessonID) {
-    console.log(`🔍 Fetching Customisation for Lesson ID: ${lessonID}`);
+   
 
     const customisationQuery = `
         query {
@@ -146,13 +144,9 @@ async function fetchLessonCustomisation(lessonID) {
     `;
 
     const response = await fetchGraphQL(customisationQuery);
-    const customisation = response?.calcClassCustomisations?.[0] || null;
-    
-    console.log(`📌 Lesson Customisation Data for Lesson ${lessonID}:`, customisation ? "✅ Available" : "❌ Not Available", customisation);
-
+    const customisation = response?.calcClassCustomisations?.[0] || null;   
     return customisation;
 }
-
 // Function to calculate the next Sunday from a given date
 function getUpcomingSunday(startDateUnix, weeksOffset = 0) {
     const startDate = new Date(startDateUnix * 1000);
@@ -166,24 +160,17 @@ async function determineAssessmentDueDate(lesson, moduleStartDateUnix) {
     const lessonID = lesson.ID;
     const dueWeek = lesson.Assessment_Due_End_of_Week;
     const customisation = await fetchLessonCustomisation(lessonID);
-
     let dueDateUnix;
     let dueDateText;
-
     if (customisation) {
-        console.log(`🛠 Applying Lesson Customisation for Lesson ${lessonID}...`);
-
         if (customisation.Specific_Date) {
             dueDateUnix = customisation.Specific_Date > 9999999999
                 ? Math.floor(customisation.Specific_Date / 1000)
                 : customisation.Specific_Date;
 
             dueDateText = `Due on ${formatDate(dueDateUnix)}`;
-            console.log(`📅 Using Specific Due Date: ${dueDateText} (Unix: ${dueDateUnix})`);
+           
         } else if (customisation.Days_to_Offset !== null) {
-            console.log("🔄 Applying Offset Logic for Due Date...");
-            console.log("🔹 Offset Days:", customisation.Days_to_Offset);
-
             if (customisation.Days_to_Offset === 0) {
                 dueDateUnix = moduleStartDateUnix;
             } else if (customisation.Days_to_Offset === -1) {
@@ -193,17 +180,12 @@ async function determineAssessmentDueDate(lesson, moduleStartDateUnix) {
             } else {
                 dueDateUnix = getUpcomingSunday(moduleStartDateUnix, customisation.Days_to_Offset);
             }
-
-            dueDateText = `Due on ${formatDate(dueDateUnix)}`;
-            console.log(`📅 Due Date After Offset: ${dueDateText}`);
+            dueDateText = `Due on ${formatDate(dueDateUnix)}`;          
         } else {
-            console.warn("⚠️ Customisation exists but has NO Specific Date or Offset. Using Default Logic.");
-            dueDateUnix = getUpcomingSunday(moduleStartDateUnix, dueWeek);
+         dueDateUnix = getUpcomingSunday(moduleStartDateUnix, dueWeek);
             dueDateText = `Due on ${formatDate(dueDateUnix)}`;
         }
-    } else {
-        console.log(`❌ No Customisation for Lesson ${lessonID}, applying default due date logic...`);
-        
+    } else { 
         if (dueWeek === 0) {
             dueDateUnix = moduleStartDateUnix;
         } else {
@@ -212,8 +194,6 @@ async function determineAssessmentDueDate(lesson, moduleStartDateUnix) {
 
         dueDateText = `Due on ${formatDate(dueDateUnix)}`;
     }
-
-    console.log(`✅ Final Due Date Calculation: ${dueDateText}`);
     return { dueDateUnix, dueDateText };
 }
 
@@ -222,14 +202,8 @@ async function determineAssessmentDueDate(lesson, moduleStartDateUnix) {
 // Function to determine module availability
 function determineAvailability(startDateUnix, weeks, customisation) {
     if (!startDateUnix) {
-        console.warn("⚠️ No Start Date Provided!");
         return { isAvailable: false, openDateText: "No Start Date" };
     }
-
-    console.log(`📌 Processing Availability Calculation...`);
-    console.log(`🔹 Start Date Unix: ${startDateUnix}`);
-    console.log(`🔹 Weeks from Start Date: ${weeks}`);
-
     let openDateUnix;
     let openDateText;
 
@@ -237,10 +211,8 @@ function determineAvailability(startDateUnix, weeks, customisation) {
         // Default logic when no customization exists
         openDateUnix = startDateUnix + (weeks * 7 * 24 * 60 * 60);
         openDateText = `Unlocks on ${formatDate(openDateUnix)}`;
-        console.log("✅ No Customization Found. Using Default Open Date:", openDateText);
+   
     } else {
-        console.log("🛠 Customization Data Found:", customisation);
-
         if (customisation.Specific_Date) {
             // Convert Specific Date (Detect if it's in milliseconds or seconds)
             openDateUnix = customisation.Specific_Date > 9999999999 
@@ -248,17 +220,10 @@ function determineAvailability(startDateUnix, weeks, customisation) {
                 : customisation.Specific_Date;  // Already in seconds
 
             openDateText = `Unlocks on ${formatDate(openDateUnix)}`;
-            console.log(`📅 Using Specific Date from Customization: ${openDateText} (Unix: ${openDateUnix})`);
         } else if (customisation.Days_to_Offset !== null) {
-            // Apply offset logic
-            console.log("🔄 Applying Offset Logic...");
-            console.log("🔹 Offset Days:", customisation.Days_to_Offset);
-
             openDateUnix = startDateUnix + (customisation.Days_to_Offset * 24 * 60 * 60);
             openDateText = `Unlocks on ${formatDate(openDateUnix)}`;
-            console.log("📅 Open Date After Offset:", openDateText);
         } else {
-            console.warn("⚠️ Customization exists but has NO Specific Date or Offset. Using Default Logic.");
             openDateUnix = startDateUnix + (weeks * 7 * 24 * 60 * 60);
             openDateText = `Unlocks on ${formatDate(openDateUnix)}`;
         }
@@ -266,14 +231,8 @@ function determineAvailability(startDateUnix, weeks, customisation) {
 
     const todayUnix = Math.floor(Date.now() / 1000);
     const isAvailable = openDateUnix >= todayUnix;
-
-    console.log(`✅ Final Calculation: Open Date - ${openDateText}, Available - ${isAvailable}`);
-
     return { isAvailable, openDateText };
 }
-
-
-
 // Function to fetch lesson statuses
 async function fetchLessonStatuses() {
     const completedLessons = await fetchGraphQL(completedQuery);
@@ -297,7 +256,7 @@ async function combineModulesAndLessons() {
     const lessonsData = lessonsResponse?.calcLessons || []; // ✅ Use correct source
 
     if (!Array.isArray(modules) || !Array.isArray(lessonsData)) {
-        console.error("Modules or Lessons Data is not an array:", modules, lessonsData);
+       
         return [];
     }
 
@@ -351,34 +310,34 @@ async function combineModulesAndLessons() {
             modulesMap[moduleId].Lessons.push({
                 ...lesson,
                 Lessons_Unique_ID:lesson.Unique_ID,
-                Lessons_Lesson_Name: lesson.Lesson_Name, // ✅ From new query
-                Lesson_AWC_Lesson_Content_Page_URL: lesson.AWC_Lesson_Content_Page_URL, // ✅ From new query
-                Lessons_Lesson_Length_in_Hour: lesson.Lesson_Length_in_Hour, // ✅ From new query
-                Lessons_Lesson_Length_in_Minute: lesson.Lesson_Length_in_Minute, // ✅ From new query
-                Lessons_Lesson_Length_in_Second: lesson.Lesson_Length_in_Second, // ✅ From new query
-                Lessons_Lesson_Introduction_Text: lesson.Lesson_Introduction_Text, // ✅ From new query
-                Lessons_Lesson_Learning_Outcome: lesson.Lesson_Learning_Outcome, // ✅ From new query
-                LessonsID: lesson.ID, // ✅ From new query
-                LessonsType: lesson.Type, // ✅ From new query
+                Lessons_Lesson_Name: lesson.Lesson_Name,
+                Lesson_AWC_Lesson_Content_Page_URL: lesson.AWC_Lesson_Content_Page_URL,
+                Lessons_Lesson_Length_in_Hour: lesson.Lesson_Length_in_Hour,
+                Lessons_Lesson_Length_in_Minute: lesson.Lesson_Length_in_Minute,
+                Lessons_Lesson_Length_in_Second: lesson.Lesson_Length_in_Second,
+                Lessons_Lesson_Introduction_Text: lesson.Lesson_Introduction_Text,
+                Lessons_Lesson_Learning_Outcome: lesson.Lesson_Learning_Outcome,
+                LessonsID: lesson.ID,
+                LessonsType: lesson.Type,
                 Due_Date_Text: dueDateInfo.dueDateText, // Will be updated later
                 Status: status, // ✅ From lesson status
-                Lessons_Your_Next_Step: lesson.Your_Next_Step, // ✅ From new query
-                Lessons_Join_Your_New_Community: lesson.Join_Your_New_Community, // ✅ From new query
-                Lessons_Give_Us_Your_Feedback: lesson.Give_Us_Your_Feedback, // ✅ From new query
-                Lessons_Download_Your_Certificate: lesson.Download_Your_Certificate, // ✅ From new query
-                Enrolment_Student_ID: lesson.Enrolment_Student_ID, // ✅ From new query
+                Lessons_Your_Next_Step: lesson.Your_Next_Step,
+                Lessons_Join_Your_New_Community: lesson.Join_Your_New_Community,
+                Lessons_Give_Us_Your_Feedback: lesson.Give_Us_Your_Feedback,
+                Lessons_Download_Your_Certificate: lesson.Download_Your_Certificate,
+                Enrolment_Student_ID: lesson.Enrolment_Student_ID,
 
                 // Module-level Information
                 Module_Name: modulesMap[moduleId].Module_Name,
                 Enrolment_Date_Completion: modulesMap[moduleId].Enrolment_Date_Completion,
-                Enrolment_Certificate_Link: modulesMap[moduleId].Enrolment_Certificate_Link,// ✅ From module
-                EnrolmentID: modulesMap[moduleId].EnrolmentID, // ✅ From module
-                Don_t_Track_Progress: modulesMap[moduleId].Don_t_Track_Progress, // ✅ From module
-                Course_Course_Access_Type: modulesMap[moduleId].Course_Course_Access_Type, // ✅ From module
-                Module_Description: modulesMap[moduleId].Description, // ✅ From module
-                Open_Date_Text: modulesMap[moduleId].Open_Date_Text, // ✅ From module
-                isAvailable: modulesMap[moduleId].isAvailable, // ✅ From module
-                Week_Open_from_Start_Date: modulesMap[moduleId].Week_Open_from_Start_Date, // ✅ From module
+                Enrolment_Certificate_Link: modulesMap[moduleId].Enrolment_Certificate_Link,
+                EnrolmentID: modulesMap[moduleId].EnrolmentID, 
+                Don_t_Track_Progress: modulesMap[moduleId].Don_t_Track_Progress, 
+                Course_Course_Access_Type: modulesMap[moduleId].Course_Course_Access_Type, 
+                Module_Description: modulesMap[moduleId].Description, 
+                Open_Date_Text: modulesMap[moduleId].Open_Date_Text, 
+                isAvailable: modulesMap[moduleId].isAvailable, 
+                Week_Open_from_Start_Date: modulesMap[moduleId].Week_Open_from_Start_Date, 
             });
         }
     }
@@ -412,7 +371,7 @@ async function renderModules() {
     const modules = await combineModulesAndLessons();
 
     if (!Array.isArray(modules)) {
-        console.error("Modules is not an array after processing:", modules);
+       
         return;
     }
 
@@ -426,13 +385,6 @@ async function renderModules() {
     $("#progressModulesContainer").html(progressOutput);
 }
 
-// Event Listeners
-// function addEventListenerIfExists(id, event, handler) {
-//     const element = document.getElementById(id);
-//     if (element) {
-//         element.addEventListener(event, handler);
-//     }
-// }
 function addEventListenerIfExists(id, event, handler) {
     const element = document.getElementById(id);
     if (element) {
