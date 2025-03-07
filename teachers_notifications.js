@@ -52,14 +52,14 @@ try {
   });
 
   const result = await response.json();
-  console.log('Class IDs:', result);
+
   
   if (result.data && result.data.calcClasses) {
       return result.data.calcClasses.map(cls => cls.ID);
   }
   return [];
 } catch (error) {
-  console.error("Error fetching class IDs:", error);
+
   return [];
 }
 }
@@ -69,7 +69,7 @@ async function initializeSocket() {
     const classIds = await fetchClassIds(); // Fetch all class IDs
 
     if (!classIds || classIds.length === 0) {
-        console.error("No class IDs found. Cannot initialize WebSocket.");
+      
         return;
     }
 
@@ -141,7 +141,7 @@ async function initializeSocket() {
     });
 
     if (filteredNotifications.length === 0) {
-        console.warn(`⚠️ All notifications for Class ID ${classId} were filtered out.`);
+     
         return;
     }
 
@@ -161,13 +161,13 @@ async function initializeSocket() {
         fetchReadDataForClass(classId);
 
         socket.onclose = () => {
-            console.warn(`⚠️ WebSocket closed for Class ID ${classId}. Retrying...`);
+         
             clearInterval(keepAliveInterval);
             setTimeout(() => initializeSocket(), 2000);
         };
 
         socket.onerror = (error) => {
-            console.error(`❌ WebSocket error for Class ID ${classId}:`, error);
+         
         };
     });
 }
@@ -312,7 +312,7 @@ async function markAsRead(announcementId) {
         }
     } catch (error) {
         pendingAnnouncements.delete(announcementId);
-        console.error("❌ Error marking notification as read:", error);
+        
     }
 }
 
@@ -321,7 +321,7 @@ async function markAsRead(announcementId) {
 
 // ✅ Mark all unread notifications as read
 function markAllAsRead() {
-    console.log("✅ Marking all unread notifications as read...");
+  
 
     let hasUnread = false;
 
@@ -332,7 +332,7 @@ function markAllAsRead() {
         }
     });
 
-    console.log("✅ All unread notifications marked as read.");
+
 
     // ✅ Hide "Mark All Read" elements if no unread notifications exist
     updateMarkAllReadVisibility();
@@ -346,13 +346,13 @@ document.addEventListener("DOMContentLoaded", () => {
 const markAllBtn = document.getElementById("markEveryAsRead");
 if (markAllBtn) {
     markAllBtn.addEventListener("click", markAllAsRead);
-    console.log("Mark All Read button initialized.");
+   
 } else {
-    console.warn("Button with ID 'markEveryAsRead' not found.");
+  
 }
 });
 function fetchReadDataForClass(classId) {
-    console.log(`🔍 Fetching read data for Class ID: ${classId}`);
+    
     
     fetch(HTTP_ENDPOINT, {
         method: "POST",
@@ -384,7 +384,7 @@ function fetchReadDataForClass(classId) {
         }
     })
     .catch((error) => {
-        console.error(`❌ Error fetching read data for Class ID ${classId}:`, error);
+     
     });
 }
 
