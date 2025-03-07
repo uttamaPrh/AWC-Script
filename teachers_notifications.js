@@ -198,12 +198,12 @@ card.addEventListener("click", async function () {
   }
 
   if (type === 'Comment' || type === 'Post') {
-      window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}?selectedTab=chats`;
+      window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}?selectedTab=chats?current-post-id=${notification.Post_ID}`;
   } else if (type === 'Submissions') {
     openIframeModal(notification.Submissions_AWC_Teacher_s_Portal_Student_s_Submission_Details_Page_URL);
       //window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}`;
   } else {
-      window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}?selectedTab=announcements`;
+      window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}?selectedTab=announcements?data-announcement-template-id=${notification.ID}`;
   }
 });
 
