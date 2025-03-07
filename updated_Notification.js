@@ -229,11 +229,6 @@ function processNotification(notification) {
     updateNoNotificationMessages(); 
     updateNoNotificationMessagesSec();
 }
-
-
-
-
-
 // ✅ Update read status UI
 function updateNotificationReadStatus() {
     cardMap.forEach((cards, id) => {
