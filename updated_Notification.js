@@ -63,34 +63,21 @@ try {
   return [];
 }
 }
-
-
-
 async function initializeSocket() {
-    const classIds = await fetchClassIds(); // Fetch all class IDs
-
+    const classIds = await fetchClassIds(); 
     if (!classIds || classIds.length === 0) {
-        console.error("No class IDs found. Cannot initialize WebSocket.");
         return;
     }
-
-    
-
     classIds.forEach((classId) => {
-        const socket = new WebSocket(WS_ENDPOINT, "vitalstats"); // ✅ Open a new WebSocket per class ID
+        const socket = new WebSocket(WS_ENDPOINT, "vitalstats");
         let keepAliveInterval;
-
         socket.onopen = () => {
-           
-
             keepAliveInterval = setInterval(() => {
                 if (socket.readyState === WebSocket.OPEN) {
                     socket.send(JSON.stringify({ type: "KEEP_ALIVE" }));
                 }
             }, 28000);
-
             socket.send(JSON.stringify({ type: "connection_init" }));
-
             // ✅ Subscribe for EACH class ID
             socket.send(
                 JSON.stringify({
@@ -142,7 +129,7 @@ async function initializeSocket() {
     });
 
     if (filteredNotifications.length === 0) {
-        console.warn(`⚠️ All notifications for Class ID ${classId} were filtered out.`);
+       
         return;
     }
 
@@ -162,13 +149,13 @@ async function initializeSocket() {
         fetchReadDataForClass(classId);
 
         socket.onclose = () => {
-            console.warn(`⚠️ WebSocket closed for Class ID ${classId}. Retrying...`);
+           
             clearInterval(keepAliveInterval);
             setTimeout(() => initializeSocket(), 2000);
         };
 
         socket.onerror = (error) => {
-            console.error(`❌ WebSocket error for Class ID ${classId}:`, error);
+           
         };
     });
 }
@@ -318,31 +305,20 @@ async function markAsRead(announcementId) {
        
     }
 }
-
-
-
-
 // ✅ Mark all unread notifications as read
 function markAllAsRead() {
-   
-
     let hasUnread = false;
-
     cardMap.forEach((cards, id) => {
         if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
             hasUnread = true;
             markAsRead(id);
         }
     });
-
-
     // ✅ Hide "Mark All Read" elements if no unread notifications exist
     updateMarkAllReadVisibility();
     updateNoNotificationMessages(); 
     updateNoNotificationMessagesSec();
 }
-
-
 // ✅ Attach event listener to your existing "Mark All Read" button
 document.addEventListener("DOMContentLoaded", () => {
 const markAllBtn = document.getElementById("markEveryAsRead");
@@ -355,9 +331,7 @@ if (markAllBtn) {
 });
 
 // ✅ Ensure fetching read data per class
-function fetchReadDataForClass(classId) {
-    console.log(`🔍 Fetching read data for Class ID: ${classId}`);
-    
+function fetchReadDataForClass(classId) {    
     fetch(HTTP_ENDPOINT, {
         method: "POST",
         headers: {
@@ -388,10 +362,9 @@ function fetchReadDataForClass(classId) {
         }
     })
     .catch((error) => {
-        console.error(`❌ Error fetching read data for Class ID ${classId}:`, error);
+       
     });
 }
-
 function updateNoNotificationMessages() {
     const noAllMessage = document.getElementById("noAllMessage");
     const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
@@ -404,8 +377,6 @@ function updateNoNotificationMessages() {
     noAllMessage.classList.toggle("hidden", hasNotifications);
     noAnnouncementsMessage.classList.add("hidden");
 }
-
-
 // ✅ Also move this function outside DOMContentLoaded
 function updateNoNotificationMessagesSec() {
     const noAllMessageSec = document.getElementById("noAllMessageSec");
@@ -425,15 +396,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
     const showUnreadAnnounceBtn = document.getElementById("showUnreadAnnouncement");
     const showUnreadAllNotification = document.getElementById("showUnreadAllNotification");
-
     let showUnreadMode = false;
     let showUnreadAllMode = false;
-
-   
-
    function toggleVisibilityAll() {
     let hasData = false;
-
     showUnreadAllMode = false;
     showUnreadMode = false;
 
@@ -443,8 +409,6 @@ document.addEventListener("DOMContentLoaded", function () {
             hasData = true; // ✅ Mark as having data
         }
     });
-
-    // ✅ Hide "No Announcements" message, only show "No Messages" if no notifications exist
     noAllMessage.classList.toggle("hidden", hasData);
     noAnnouncementsMessage.classList.add("hidden"); // Hide announcement message when viewing all
 }
@@ -522,17 +486,11 @@ function toggleUnreadNotifications() {
     noAllMessage.classList.toggle("hidden", hasVisible);
     noAnnouncementsMessage.classList.add("hidden"); // Hide "No Announcements" when viewing all
 }
-
-
-
     onlySeeBtn.addEventListener("click", () => toggleVisibilityByType("Announcement"));
     showAllBtn.addEventListener("click", toggleVisibilityAll);
     showUnreadAnnounceBtn.addEventListener("click", toggleUnreadAnnouncements);
     showUnreadAllNotification.addEventListener("click", toggleUnreadNotifications);
 });
-
-
-
 //for View All Notification
 document.addEventListener("DOMContentLoaded", function () {
     const onlySeeBtnSec = document.getElementById("OnlyseeAnnouncementsSec");
@@ -541,19 +499,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const noAnnouncementsMessageSec = document.getElementById("noAnnouncementsMessageSec");
     const showUnreadAnnounceBtnSec = document.getElementById("showUnreadAnnouncementSec");
     const showUnreadAllNotificationSec = document.getElementById("showUnreadAllNotificationSec");
-
     let showUnreadModeSec = false;
     let showUnreadAllModeSec = false;
-
-    // ✅ Function to check if notifications are visible and update the "No Messages" display
-    // function updateNoNotificationMessagesSec() {
-    //     const hasVisible = [...cardMap.values()].some(({ clone }) => clone && !clone.classList.contains("hidden"));
-
-    //     noAllMessageSec.classList.toggle("hidden", hasVisible);
-    //     noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
-    // }
-
-    // ✅ Show only Announcements (Secondary)
     function toggleVisibilityByTypeSec(type) {
         let hasAnnouncements = false;
 
@@ -568,7 +515,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (clone) {
                 clone.classList.toggle("hidden", !shouldShow);
             }
-
             if (shouldShow) hasAnnouncements = true;
         });
 
@@ -622,7 +568,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // ✅ Correctly toggle "No Announcements" message
         noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
-        noAllMessageSec.classList.add("hidden"); // Hide "No Messages" when viewing announcements
+        noAllMessageSec.classList.add("hidden"); 
     }
 
     // ✅ Toggle Unread Notifications (Secondary)
@@ -643,17 +589,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (isUnread) hasUnread = true;
         });
-
-        // ✅ Correctly toggle "No Messages" message
         noAllMessageSec.classList.toggle("hidden", hasVisible);
         noAnnouncementsMessageSec.classList.add("hidden"); // Hide "No Announcements" when viewing all
     }
-
-    // ✅ Attach event listeners for Secondary filtering
-    // onlySeeBtnSec.addEventListener("click", () => toggleVisibilityByTypeSec("Announcement"));
-    // showAllBtnSec.addEventListener("click", toggleVisibilityAllSec);
-    // showUnreadAnnounceBtnSec.addEventListener("click", toggleUnreadAnnouncementsSec);
-    // showUnreadAllNotificationSec.addEventListener("click", toggleUnreadNotificationsSec);
 
 if (onlySeeBtnSec) {
         onlySeeBtnSec.addEventListener("click", () => toggleVisibilityByTypeSec("Announcement"));
