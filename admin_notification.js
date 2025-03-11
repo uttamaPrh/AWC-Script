@@ -35,7 +35,7 @@ return "Just now";
 async function fetchClassIds() {
 const query = `
 query calcClasses {
-  calcClasses(query: [{ where: { teacher_id: ${CONTACTss_ID} } }]) {
+  calcClasses {
     ID: field(arg: ["id"])
   }
 }
