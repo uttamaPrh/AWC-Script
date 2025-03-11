@@ -186,7 +186,8 @@ card.addEventListener("click", async function () {
   if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
       await markAsRead(id);
   }
-
+  const loader = document.getElementById("loader");
+  loader.classList.remove("fade-out");
   if (type === 'Comment' || type === 'Post') {
       window.location.href = `https://courses.writerscentre.com.au/students/course-details/${notification.Course_Unique_ID}?eid=${notification.EnrolmentID}&selectedTab=courseChat?current-post-id=${notification.Post_ID}`;
   } else if (type === 'Submissions') {
