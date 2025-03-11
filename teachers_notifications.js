@@ -192,7 +192,8 @@ card.innerHTML = `
 card.addEventListener("click", async function () { 
   const id = Number(notification.ID);
   const type = notification.Type;
-
+const loader = document.getElementById("loader");
+  loader.classList.remove("fade-out");
   if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
       await markAsRead(id);
   }
