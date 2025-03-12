@@ -389,11 +389,28 @@ function addEventListenerIfExists(id, event, handler) {
     const element = document.getElementById(id);
     if (element) {
         element.addEventListener(event, async () => {
-            await handler();  // ✅ Fixed async execution
+            await handler();  
         });
     }
 }
+function getSelectedTabFromURLTab() {
+    let currentUrl = window.location.href;
+    let match = currentUrl.match(/[?&]selectedTab=([^?&#]*)/);
+    return match ? decodeURIComponent(match[1]) : "overview";
+} 
+function checkAndRunRenderModules() {
+    let selectedTab = getSelectedTabFromURLTab();
+    if (selectedTab === "content" || selectedTab === "progress") {
+        renderModules();
+    }
+}
 
+// Run the function on page load
+checkAndRunRenderModules();
+
+// Re-run renderModules when selectedTab changes dynamically
+window.addEventListener("popstate", checkAndRunRenderModules);
+window.addEventListener("hashchange", checkAndRunRenderModules);
 
 addEventListenerIfExists("fetchModulesLessons", "click", renderModules);
 addEventListenerIfExists("fetchProgressModulesLessons", "click", renderModules);
